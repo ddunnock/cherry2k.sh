@@ -61,7 +61,7 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CMD-01 | Phase 1 | Complete |
-| PROV-01 | Phase 2 | Pending |
+| PROV-01 | Phase 2 | Complete |
 | TERM-03 | Phase 3 | Pending |
 | TERM-04 | Phase 3 | Pending |
 | TERM-01 | Phase 4 | Pending |

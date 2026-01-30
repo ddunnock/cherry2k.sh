@@ -13,7 +13,7 @@ Cherry2K brings Warp-like AI assistance to any terminal through seamless zsh int
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation and Safety** - CLI skeleton with safe command execution architecture
-- [ ] **Phase 2: Single Provider End-to-End** - OpenAI streaming responses working via CLI
+- [x] **Phase 2: Single Provider End-to-End** - OpenAI streaming responses working via CLI
 - [ ] **Phase 3: Storage and Session Continuity** - Conversation persistence and session resume
 - [ ] **Phase 4: Zsh Integration** - The `* ` prefix inline experience
 - [ ] **Phase 5: Multi-Provider Support** - Anthropic, Ollama, and provider switching
@@ -51,9 +51,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md - Provider trait and types (AiProvider, CompletionRequest)
-- [ ] 02-02-PLAN.md - Terminal output utilities (spinner, error box, markdown, stream writer)
-- [ ] 02-03-PLAN.md - OpenAI provider with SSE streaming and chat command integration
+- [x] 02-01-PLAN.md - Provider trait and types (AiProvider, CompletionRequest)
+- [x] 02-02-PLAN.md - Terminal output utilities (spinner, error box, markdown, stream writer)
+- [x] 02-03-PLAN.md - OpenAI provider with SSE streaming and chat command integration
 
 ### Phase 3: Storage and Session Continuity
 **Goal**: Enable conversation context that persists across invocations
@@ -149,7 +149,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation and Safety | 3/3 | ✓ Complete | 2026-01-30 |
-| 2. Single Provider End-to-End | 0/3 | Not started | - |
+| 2. Single Provider End-to-End | 3/3 | ✓ Complete | 2026-01-30 |
 | 3. Storage and Session Continuity | 0/3 | Not started | - |
 | 4. Zsh Integration | 0/3 | Not started | - |
 | 5. Multi-Provider Support | 0/3 | Not started | - |
