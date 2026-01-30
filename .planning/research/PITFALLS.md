@@ -413,29 +413,29 @@ Mistakes that cause annoyance but are fixable without major rework.
 
 ## Phase-Specific Warnings
 
-| Phase Topic | Likely Pitfall | Mitigation | Phase |
-|-------------|----------------|------------|-------|
-| ZLE Widget | State corruption (#3) | Check ZLE active, no subshell calls | 1 |
-| Command Execution | Auto-execute without sandboxing (#1) | OS-level sandbox, default to ask | 1 |
-| SQLite Storage | Async blocking (#4), Busy locks (#6) | tokio-rusqlite, busy_timeout | 2 |
-| Conversation | Context explosion (#9) | Token tracking, sliding window | 2 |
-| File Operations | Scope creep (#8), Silent failure (#2) | Path validation, diff preview | 3 |
-| Provider Abstraction | Leaky abstraction (#5) | Multi-provider design upfront | 4 |
-| Streaming | Interruption (#7), Backpressure (#14) | Partial persist, buffering | 4 |
+| Phase Topic          | Likely Pitfall                        | Mitigation                          | Phase  |
+|----------------------|---------------------------------------|-------------------------------------|--------|
+| ZLE Widget           | State corruption (#3)                 | Check ZLE active, no subshell calls | 1      |
+| Command Execution    | Auto-execute without sandboxing (#1)  | OS-level sandbox, default to ask    | 1      |
+| SQLite Storage       | Async blocking (#4), Busy locks (#6)  | tokio-rusqlite, busy_timeout        | 2      |
+| Conversation         | Context explosion (#9)                | Token tracking, sliding window      | 2      |
+| File Operations      | Scope creep (#8), Silent failure (#2) | Path validation, diff preview       | 3      |
+| Provider Abstraction | Leaky abstraction (#5)                | Multi-provider design upfront       | 4      |
+| Streaming            | Interruption (#7), Backpressure (#14) | Partial persist, buffering          | 4      |
 
 ---
 
 ## Confidence Assessment
 
-| Pitfall Category | Confidence | Reasoning |
-|------------------|------------|-----------|
-| Security (1, 2) | HIGH | Documented real-world incidents, security research |
-| ZLE (3, 11) | HIGH | Official zsh documentation, multiple issue trackers |
-| Async/SQLite (4, 6, 10, 12, 13) | HIGH | tokio-rusqlite docs, rusqlite issues |
-| Provider abstraction (5) | MEDIUM | Industry patterns, but Cherry2K-specific design unknown |
-| Streaming (7, 14) | MEDIUM | AI SDK docs, general streaming patterns |
-| File operations (8) | MEDIUM | Security best practices, not Cherry2K-specific research |
-| Context (9) | MEDIUM | General LLM patterns, provider-specific limits vary |
+| Pitfall Category                | Confidence   | Reasoning                                               |
+|---------------------------------|--------------|---------------------------------------------------------|
+| Security (1, 2)                 | HIGH         | Documented real-world incidents, security research      |
+| ZLE (3, 11)                     | HIGH         | Official zsh documentation, multiple issue trackers     |
+| Async/SQLite (4, 6, 10, 12, 13) | HIGH         | tokio-rusqlite docs, rusqlite issues                    |
+| Provider abstraction (5)        | MEDIUM       | Industry patterns, but Cherry2K-specific design unknown |
+| Streaming (7, 14)               | MEDIUM       | AI SDK docs, general streaming patterns                 |
+| File operations (8)             | MEDIUM       | Security best practices, not Cherry2K-specific research |
+| Context (9)                     | MEDIUM       | General LLM patterns, provider-specific limits vary     |
 
 ---
 

@@ -18,11 +18,11 @@ The Rust ecosystem for building terminal AI assistants has matured significantly
 
 ### Core Runtime
 
-| Technology | Version | Purpose | Confidence |
-|------------|---------|---------|------------|
-| **Rust** | 1.75+ (1.77 recommended) | Native async traits, improved diagnostics | HIGH |
-| **Tokio** | 1.49.x | Async runtime, I/O, networking | HIGH |
-| **Futures** | 0.3.x | Stream trait, combinators | HIGH |
+| Technology  | Version                  | Purpose                                   | Confidence  |
+|-------------|--------------------------|-------------------------------------------|-------------|
+| **Rust**    | 1.75+ (1.77 recommended) | Native async traits, improved diagnostics | HIGH        |
+| **Tokio**   | 1.49.x                   | Async runtime, I/O, networking            | HIGH        |
+| **Futures** | 0.3.x                    | Stream trait, combinators                 | HIGH        |
 
 **Why Tokio:**
 - LTS releases (1.47.x supported until Sept 2026)
@@ -37,9 +37,9 @@ The Rust ecosystem for building terminal AI assistants has matured significantly
 
 ### HTTP Client
 
-| Technology | Version | Purpose | Confidence |
-|------------|---------|---------|------------|
-| **reqwest** | 0.13.x | HTTP client for AI provider APIs | HIGH |
+| Technology   | Version   | Purpose                          | Confidence  |
+|--------------|-----------|----------------------------------|-------------|
+| **reqwest**  | 0.13.x    | HTTP client for AI provider APIs | HIGH        |
 
 **Why reqwest:**
 - 306M+ downloads, de facto standard for HTTP in Rust
@@ -62,9 +62,9 @@ reqwest = { version = "0.13", features = ["json", "stream", "rustls-tls"] }
 
 ### Database
 
-| Technology | Version | Purpose | Confidence |
-|------------|---------|---------|------------|
-| **rusqlite** | 0.38.x | SQLite persistence | HIGH |
+| Technology   | Version  | Purpose            | Confidence  |
+|--------------|----------|--------------------|-------------|
+| **rusqlite** | 0.38.x   | SQLite persistence | HIGH        |
 
 **Why rusqlite:**
 - Bundles SQLite 3.51.1 (with `bundled` feature)
@@ -83,9 +83,9 @@ rusqlite = { version = "0.38", features = ["bundled", "chrono", "serde_json"] }
 
 ### CLI Framework
 
-| Technology | Version | Purpose | Confidence |
-|------------|---------|---------|------------|
-| **clap** | 4.5.x | CLI argument parsing | HIGH |
+| Technology  | Version   | Purpose              | Confidence  |
+|-------------|-----------|----------------------|-------------|
+| **clap**    | 4.5.x     | CLI argument parsing | HIGH        |
 
 **Why clap:**
 - De facto standard (no real competitor in 2026)
@@ -102,10 +102,10 @@ clap = { version = "4.5", features = ["derive", "env"] }
 
 ### TUI Framework (Optional Mode)
 
-| Technology | Version | Purpose | Confidence |
-|------------|---------|---------|------------|
-| **ratatui** | 0.30.x | Terminal UI for optional TUI mode | HIGH |
-| **crossterm** | 0.29.x | Cross-platform terminal control | HIGH |
+| Technology    | Version  | Purpose                           | Confidence  |
+|---------------|----------|-----------------------------------|-------------|
+| **ratatui**   | 0.30.x   | Terminal UI for optional TUI mode | HIGH        |
+| **crossterm** | 0.29.x   | Cross-platform terminal control   | HIGH        |
 
 **Why ratatui:**
 - Fork of abandoned tui-rs, actively maintained
@@ -128,11 +128,11 @@ crossterm = { version = "0.29", features = ["event-stream"] }
 
 ### Serialization
 
-| Technology | Version | Purpose | Confidence |
-|------------|---------|---------|------------|
-| **serde** | 1.0.x | Serialization framework | HIGH |
-| **serde_json** | 1.0.x | JSON for API payloads | HIGH |
-| **toml** | 0.9.x | Configuration files | HIGH |
+| Technology     | Version  | Purpose                 | Confidence  |
+|----------------|----------|-------------------------|-------------|
+| **serde**      | 1.0.x    | Serialization framework | HIGH        |
+| **serde_json** | 1.0.x    | JSON for API payloads   | HIGH        |
+| **toml**       | 0.9.x    | Configuration files     | HIGH        |
 
 **Why these versions:**
 - serde is stable at 1.0, no 2.0 planned
@@ -148,10 +148,10 @@ toml = "0.9"
 
 ### Error Handling
 
-| Technology | Version | Purpose | Confidence |
-|------------|---------|---------|------------|
-| **thiserror** | 2.0.x | Library error types | HIGH |
-| **anyhow** | 2.0.x | Application error handling | HIGH |
+| Technology    | Version  | Purpose                    | Confidence  |
+|---------------|----------|----------------------------|-------------|
+| **thiserror** | 2.0.x    | Library error types        | HIGH        |
+| **anyhow**    | 2.0.x    | Application error handling | HIGH        |
 
 **Pattern:**
 - `thiserror` in library crates (`core`, `storage`) for typed errors
@@ -166,10 +166,10 @@ anyhow = "2.0"
 
 ### Logging/Tracing
 
-| Technology | Version | Purpose | Confidence |
-|------------|---------|---------|------------|
-| **tracing** | 0.1.x | Structured logging | HIGH |
-| **tracing-subscriber** | 0.3.x | Log output formatting | HIGH |
+| Technology             | Version  | Purpose               | Confidence  |
+|------------------------|----------|-----------------------|-------------|
+| **tracing**            | 0.1.x    | Structured logging    | HIGH        |
+| **tracing-subscriber** | 0.3.x    | Log output formatting | HIGH        |
 
 **Why tracing (not log):**
 - Structured spans with begin/end times
@@ -185,9 +185,9 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 ### Configuration Paths
 
-| Technology | Version | Purpose | Confidence |
-|------------|---------|---------|------------|
-| **directories** | 5.x | XDG-compliant config paths | HIGH |
+| Technology      | Version  | Purpose                    | Confidence  |
+|-----------------|----------|----------------------------|-------------|
+| **directories** | 5.x      | XDG-compliant config paths | HIGH        |
 
 **Why directories (not dirs or xdg):**
 - Cross-platform (macOS, Linux, Windows)
@@ -216,13 +216,13 @@ if let Some(proj_dirs) = ProjectDirs::from("", "", "cherry2k") {
 
 **Why:**
 
-| Factor | Build Own | Use rust-genai/async-openai |
-|--------|-----------|----------------------------|
-| Control | Full control over streaming, errors | Limited by library design |
-| Dependencies | Only reqwest + serde | Additional crate + transitive deps |
-| Stability | You control the code | Library churn (0.5.x, breaking changes) |
-| Learning | Understand the APIs | Black box |
-| Maintenance | You maintain | Dependent on maintainer |
+| Factor       | Build Own                           | Use rust-genai/async-openai             |
+|--------------|-------------------------------------|-----------------------------------------|
+| Control      | Full control over streaming, errors | Limited by library design               |
+| Dependencies | Only reqwest + serde                | Additional crate + transitive deps      |
+| Stability    | You control the code                | Library churn (0.5.x, breaking changes) |
+| Learning     | Understand the APIs                 | Black box                               |
+| Maintenance  | You maintain                        | Dependent on maintainer                 |
 
 **The APIs are simple.** OpenAI/Anthropic/Ollama are just REST endpoints with SSE streaming. The complexity is in handling the responses, not making the requests.
 
@@ -257,11 +257,11 @@ pub async fn stream_completion(
 
 ### Provider-Specific Notes
 
-| Provider | Endpoint | Auth | Streaming Format |
-|----------|----------|------|------------------|
-| OpenAI | `api.openai.com/v1/chat/completions` | Bearer token | SSE with `data: {json}` |
-| Anthropic | `api.anthropic.com/v1/messages` | `x-api-key` header | SSE with `event:` + `data:` |
-| Ollama | `localhost:11434/api/chat` | None | NDJSON (newline-delimited JSON) |
+| Provider  | Endpoint                             | Auth               | Streaming Format                |
+|-----------|--------------------------------------|--------------------|---------------------------------|
+| OpenAI    | `api.openai.com/v1/chat/completions` | Bearer token       | SSE with `data: {json}`         |
+| Anthropic | `api.anthropic.com/v1/messages`      | `x-api-key` header | SSE with `event:` + `data:`     |
+| Ollama    | `localhost:11434/api/chat`           | None               | NDJSON (newline-delimited JSON) |
 
 **Key difference:** Anthropic uses `event:` lines to indicate event type, OpenAI does not. Ollama uses NDJSON, not SSE. Your abstraction must handle all three.
 
@@ -269,11 +269,11 @@ pub async fn stream_completion(
 
 ## Testing Stack
 
-| Technology | Version | Purpose | Confidence |
-|------------|---------|---------|------------|
-| **wiremock** | 0.6.x | HTTP mocking for API tests | HIGH |
-| **tokio-test** | 0.4.x | Async test utilities | HIGH |
-| **cargo-llvm-cov** | 0.6.23 | Code coverage | HIGH |
+| Technology         | Version  | Purpose                    | Confidence  |
+|--------------------|----------|----------------------------|-------------|
+| **wiremock**       | 0.6.x    | HTTP mocking for API tests | HIGH        |
+| **tokio-test**     | 0.4.x    | Async test utilities       | HIGH        |
+| **cargo-llvm-cov** | 0.6.23   | Code coverage              | HIGH        |
 
 **Why wiremock:**
 - Designed for async (works with tokio)
@@ -293,25 +293,25 @@ cargo llvm-cov --fail-under-lines 80
 
 ### Avoid These Libraries
 
-| Library | Why Avoid |
-|---------|-----------|
-| **async-trait** | Rust 1.75+ has native async traits. No longer needed. |
-| **async-std** | Discontinued March 2025. Tokio is the standard. |
-| **tui** | Abandoned. Use ratatui (active fork). |
-| **diesel** | ORM overhead unnecessary for CLI tool with SQLite. |
-| **sqlx** | Compile-time query checking adds complexity for simple schemas. |
-| **rust-genai** | Rapidly evolving (0.5.x), adds unnecessary abstraction. |
-| **async-openai** | Specific to OpenAI, doesn't help with Anthropic/Ollama. |
-| **log** | Older logging crate. tracing is the modern choice. |
+| Library          | Why Avoid                                                       |
+|------------------|-----------------------------------------------------------------|
+| **async-trait**  | Rust 1.75+ has native async traits. No longer needed.           |
+| **async-std**    | Discontinued March 2025. Tokio is the standard.                 |
+| **tui**          | Abandoned. Use ratatui (active fork).                           |
+| **diesel**       | ORM overhead unnecessary for CLI tool with SQLite.              |
+| **sqlx**         | Compile-time query checking adds complexity for simple schemas. |
+| **rust-genai**   | Rapidly evolving (0.5.x), adds unnecessary abstraction.         |
+| **async-openai** | Specific to OpenAI, doesn't help with Anthropic/Ollama.         |
+| **log**          | Older logging crate. tracing is the modern choice.              |
 
 ### Avoid These Patterns
 
-| Pattern | Why Avoid | Do Instead |
-|---------|-----------|------------|
-| `.unwrap()` in library code | Panics are infectious | Return `Result<T, E>` |
-| Global `static` for config | Hard to test | Pass config as parameter |
-| Blocking calls in async | Deadlocks the runtime | Use `tokio::fs`, `spawn_blocking` |
-| String errors | No context, hard to match | Use `thiserror` enums |
+| Pattern                     | Why Avoid                 | Do Instead                        |
+|-----------------------------|---------------------------|-----------------------------------|
+| `.unwrap()` in library code | Panics are infectious     | Return `Result<T, E>`             |
+| Global `static` for config  | Hard to test              | Pass config as parameter          |
+| Blocking calls in async     | Deadlocks the runtime     | Use `tokio::fs`, `spawn_blocking` |
+| String errors               | No context, hard to match | Use `thiserror` enums             |
 
 ---
 
@@ -371,18 +371,18 @@ tokio-test = "0.4"
 
 ## Version Verification Sources
 
-| Library | Source | Confidence |
-|---------|--------|------------|
-| tokio 1.49 | [crates.io](https://crates.io/crates/tokio), [docs.rs](https://docs.rs/crate/tokio/latest) | HIGH |
-| reqwest 0.13 | [GitHub](https://github.com/seanmonstar/reqwest) | HIGH |
-| rusqlite 0.38 | [docs.rs](https://docs.rs/crate/rusqlite/latest), [crates.io](https://crates.io/crates/rusqlite) | HIGH |
-| clap 4.5.54 | [crates.io](https://crates.io/crates/clap) | HIGH |
-| ratatui 0.30 | [ratatui.rs](https://ratatui.rs/highlights/v030/) | HIGH |
-| crossterm 0.29 | [crates.io](https://crates.io/crates/crossterm/0.29.0) | HIGH |
-| thiserror 2.0 | [Multiple 2025 guides](https://dev.to/leapcell/rust-error-handling-compared-anyhow-vs-thiserror-vs-snafu-2003) | HIGH |
-| anyhow 2.0 | [Multiple 2025 guides](https://dev.to/leapcell/rust-error-handling-compared-anyhow-vs-thiserror-vs-snafu-2003) | HIGH |
-| wiremock 0.6 | [lib.rs](https://lib.rs/crates/wiremock), [crates.io](https://crates.io/crates/wiremock) | MEDIUM |
-| cargo-llvm-cov 0.6.23 | [docs.rs](https://docs.rs/crate/cargo-llvm-cov/latest), [crates.io](https://crates.io/crates/cargo-llvm-cov) | HIGH |
+| Library               | Source                                                                                                         | Confidence   |
+|-----------------------|----------------------------------------------------------------------------------------------------------------|--------------|
+| tokio 1.49            | [crates.io](https://crates.io/crates/tokio), [docs.rs](https://docs.rs/crate/tokio/latest)                     | HIGH         |
+| reqwest 0.13          | [GitHub](https://github.com/seanmonstar/reqwest)                                                               | HIGH         |
+| rusqlite 0.38         | [docs.rs](https://docs.rs/crate/rusqlite/latest), [crates.io](https://crates.io/crates/rusqlite)               | HIGH         |
+| clap 4.5.54           | [crates.io](https://crates.io/crates/clap)                                                                     | HIGH         |
+| ratatui 0.30          | [ratatui.rs](https://ratatui.rs/highlights/v030/)                                                              | HIGH         |
+| crossterm 0.29        | [crates.io](https://crates.io/crates/crossterm/0.29.0)                                                         | HIGH         |
+| thiserror 2.0         | [Multiple 2025 guides](https://dev.to/leapcell/rust-error-handling-compared-anyhow-vs-thiserror-vs-snafu-2003) | HIGH         |
+| anyhow 2.0            | [Multiple 2025 guides](https://dev.to/leapcell/rust-error-handling-compared-anyhow-vs-thiserror-vs-snafu-2003) | HIGH         |
+| wiremock 0.6          | [lib.rs](https://lib.rs/crates/wiremock), [crates.io](https://crates.io/crates/wiremock)                       | MEDIUM       |
+| cargo-llvm-cov 0.6.23 | [docs.rs](https://docs.rs/crate/cargo-llvm-cov/latest), [crates.io](https://crates.io/crates/cargo-llvm-cov)   | HIGH         |
 
 ---
 

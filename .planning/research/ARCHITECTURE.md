@@ -49,14 +49,14 @@ Research of existing tools (aichat, Claude Code, gptme, zsh_codex) reveals consi
 
 ### Component Boundaries
 
-| Component | Responsibility | Communicates With | Technology |
-|-----------|---------------|-------------------|------------|
-| **ZLE Widget** | Capture `* ` prefix, invoke binary, display output | Shell environment, binary via subprocess | Pure zsh |
-| **Shell Functions** | Helper commands (`cherry2k-config`, etc.) | Binary via subprocess | Pure zsh |
-| **CLI Layer** | Parse args, route commands, format output | Core library, Storage | Rust (clap) |
-| **Core Library** | Provider abstraction, conversation logic, config | Providers, Storage types | Rust (async traits) |
-| **Provider Implementations** | API-specific request/response handling | External APIs via HTTP | Rust (reqwest) |
-| **Storage Layer** | Conversation persistence, session management | SQLite database | Rust (rusqlite) |
+| Component                    | Responsibility                                     | Communicates With                        | Technology          |
+|------------------------------|----------------------------------------------------|------------------------------------------|---------------------|
+| **ZLE Widget**               | Capture `* ` prefix, invoke binary, display output | Shell environment, binary via subprocess | Pure zsh            |
+| **Shell Functions**          | Helper commands (`cherry2k-config`, etc.)          | Binary via subprocess                    | Pure zsh            |
+| **CLI Layer**                | Parse args, route commands, format output          | Core library, Storage                    | Rust (clap)         |
+| **Core Library**             | Provider abstraction, conversation logic, config   | Providers, Storage types                 | Rust (async traits) |
+| **Provider Implementations** | API-specific request/response handling             | External APIs via HTTP                   | Rust (reqwest)      |
+| **Storage Layer**            | Conversation persistence, session management       | SQLite database                          | Rust (rusqlite)     |
 
 ### Critical Boundary: Shell vs Binary
 
@@ -468,12 +468,12 @@ fpath=("${0:A:h}/completions" $fpath)
 
 ## Scalability Considerations
 
-| Concern | At Personal Use | At Power User | At Team Use |
-|---------|-----------------|---------------|-------------|
-| Conversation History | Thousands of rows, no issue | Tens of thousands, consider pruning | SQLite scales fine |
-| Context Window | Track tokens, truncate old messages | Same + summarization | Same |
-| Multiple Providers | Runtime switching works | Same | Config per user |
-| Concurrent Access | N/A (single user) | Multiple terminals fine | WAL mode for SQLite |
+| Concern              | At Personal Use                     | At Power User                       | At Team Use         |
+|----------------------|-------------------------------------|-------------------------------------|---------------------|
+| Conversation History | Thousands of rows, no issue         | Tens of thousands, consider pruning | SQLite scales fine  |
+| Context Window       | Track tokens, truncate old messages | Same + summarization                | Same                |
+| Multiple Providers   | Runtime switching works             | Same                                | Config per user     |
+| Concurrent Access    | N/A (single user)                   | Multiple terminals fine             | WAL mode for SQLite |
 
 For Cherry2K's scope (personal terminal assistant), SQLite with default settings handles all realistic usage.
 

@@ -188,12 +188,12 @@ Phases with standard patterns (skip research-phase):
 
 ## Confidence Assessment
 
-| Area | Confidence | Notes |
-|------|------------|-------|
-| Stack | HIGH | Verified against crates.io, docs.rs, multiple 2026 guides. Clear ecosystem winners. |
-| Features | HIGH | Cross-referenced Warp, Copilot CLI, Claude Code, and 2026 reviews. Consistent findings. |
-| Architecture | HIGH | Patterns verified against aichat, Claude Code, zsh_codex. Well-established. |
-| Pitfalls | HIGH | Documented real incidents, official docs, issue trackers. Critical pitfalls well-sourced. |
+| Area         | Confidence  | Notes                                                                                     |
+|--------------|-------------|-------------------------------------------------------------------------------------------|
+| Stack        | HIGH        | Verified against crates.io, docs.rs, multiple 2026 guides. Clear ecosystem winners.       |
+| Features     | HIGH        | Cross-referenced Warp, Copilot CLI, Claude Code, and 2026 reviews. Consistent findings.   |
+| Architecture | HIGH        | Patterns verified against aichat, Claude Code, zsh_codex. Well-established.               |
+| Pitfalls     | HIGH        | Documented real incidents, official docs, issue trackers. Critical pitfalls well-sourced. |
 
 **Overall confidence:** HIGH
 

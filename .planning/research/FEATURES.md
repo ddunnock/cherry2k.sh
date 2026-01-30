@@ -16,18 +16,18 @@ The terminal AI assistant market has matured significantly by 2026. Key players 
 
 Features users expect. Missing = product feels incomplete or users leave.
 
-| Feature | Why Expected | Complexity | Implementation Notes |
-|---------|--------------|------------|---------------------|
-| **Natural language to command** | Core value prop of any terminal AI. Users type plain English, get executable commands. | Low | All competitors have this. Use LLM with system prompt for shell context. |
-| **Command explanation** | Users want to understand what commands do before running them. Warp, Copilot CLI, and others all provide this. | Low | Generate explanation alongside command. Optional "explain" mode. |
-| **Confirmation before execution** | Safety requirement. Prevents destructive commands from running automatically. "The LITL attack" research shows approval dialogs are critical. | Low | MUST have for any command that modifies state. Show command, ask Y/n. |
-| **Streaming responses** | Users expect real-time token streaming, not waiting for complete response. All modern AI tools stream. | Medium | SSE or chunked responses. Provider abstraction must support streaming. |
-| **Error explanation** | When commands fail, AI should explain what went wrong. Warp excels here with proactive error analysis. | Medium | Capture stderr, send to LLM with context, return explanation. |
-| **Conversation context** | Users expect follow-up questions to work. "Now do that for all .py files" should understand "that" from prior context. | Medium | Session-based context window. SQLite storage for persistence. |
-| **Cross-platform model support** | Users want choice: OpenAI, Anthropic, local Ollama. Cost and privacy concerns drive this. | Medium | Provider abstraction trait. Cherry2K already plans this. |
-| **Command history awareness** | AI should see recent commands to provide contextual suggestions. | Low | Read shell history or track within session. |
-| **Syntax highlighting** | Command output and AI responses should be readable with proper highlighting. | Low | Use terminal color codes. Bat/ratatui for TUI mode. |
-| **Tab/keybinding integration** | Quick access via shortcut (Ctrl+G, Ctrl+X, etc.). Manual typing of prefix is acceptable but shortcuts expected. | Low | ZLE widget binding. Cherry2K plans `* ` prefix which is valid. |
+| Feature                           | Why Expected                                                                                                                                  | Complexity   | Implementation Notes                                                     |
+|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|--------------|--------------------------------------------------------------------------|
+| **Natural language to command**   | Core value prop of any terminal AI. Users type plain English, get executable commands.                                                        | Low          | All competitors have this. Use LLM with system prompt for shell context. |
+| **Command explanation**           | Users want to understand what commands do before running them. Warp, Copilot CLI, and others all provide this.                                | Low          | Generate explanation alongside command. Optional "explain" mode.         |
+| **Confirmation before execution** | Safety requirement. Prevents destructive commands from running automatically. "The LITL attack" research shows approval dialogs are critical. | Low          | MUST have for any command that modifies state. Show command, ask Y/n.    |
+| **Streaming responses**           | Users expect real-time token streaming, not waiting for complete response. All modern AI tools stream.                                        | Medium       | SSE or chunked responses. Provider abstraction must support streaming.   |
+| **Error explanation**             | When commands fail, AI should explain what went wrong. Warp excels here with proactive error analysis.                                        | Medium       | Capture stderr, send to LLM with context, return explanation.            |
+| **Conversation context**          | Users expect follow-up questions to work. "Now do that for all .py files" should understand "that" from prior context.                        | Medium       | Session-based context window. SQLite storage for persistence.            |
+| **Cross-platform model support**  | Users want choice: OpenAI, Anthropic, local Ollama. Cost and privacy concerns drive this.                                                     | Medium       | Provider abstraction trait. Cherry2K already plans this.                 |
+| **Command history awareness**     | AI should see recent commands to provide contextual suggestions.                                                                              | Low          | Read shell history or track within session.                              |
+| **Syntax highlighting**           | Command output and AI responses should be readable with proper highlighting.                                                                  | Low          | Use terminal color codes. Bat/ratatui for TUI mode.                      |
+| **Tab/keybinding integration**    | Quick access via shortcut (Ctrl+G, Ctrl+X, etc.). Manual typing of prefix is acceptable but shortcuts expected.                               | Low          | ZLE widget binding. Cherry2K plans `* ` prefix which is valid.           |
 
 ### Verification Sources
 - [Warp All Features](https://www.warp.dev/all-features)
@@ -40,18 +40,18 @@ Features users expect. Missing = product feels incomplete or users leave.
 
 Features that set product apart. Not expected, but highly valued.
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **Intent detection (question vs command vs code task)** | Automatically detect if user wants: (a) question answered, (b) command generated, (c) file modified. No mode switching needed. | High | Cherry2K's key differentiator. Use LLM classification or heuristics. Avoids "command processor not intent interpreter" anti-pattern. |
-| **Inline responses (not separate REPL)** | Responses appear in-flow with normal terminal usage. No context switch to separate window. | High | Cherry2K's design choice. ZLE widget injection. More natural than Copilot CLI's separate prompt. |
-| **File diff preview before apply** | Show unified diff of proposed changes, let user approve/reject. Cursor, Cline, Claude Code all do this. | Medium | Use `similar` or custom diff. Show +/- lines with color. |
-| **Multi-file awareness** | Understand project structure, not just current directory. Can modify related files together. | High | Requires indexing or "add files to context" command. Expensive token-wise. |
-| **Autonomous mode with guardrails** | Let AI run multiple commands in sequence (like Warp's "dispatch mode") but with safety checks. | High | Risky. Only for advanced users. Require explicit opt-in. |
-| **Local-first with Ollama** | Privacy-conscious users can run entirely local. No data leaves machine. | Medium | Ollama provider already planned. Emphasize in marketing. |
-| **Cost-aware model selection** | Show token usage, let users pick cheaper models for simple tasks. "Which tool won't torch my credits?" is a 2026 concern. | Medium | Track tokens per request. Suggest model based on task complexity. |
-| **Session persistence** | Resume conversations across terminal restarts. "What was I working on yesterday?" | Medium | SQLite storage. Cherry2K already plans this. |
-| **Shell command suggestions** | As user types, suggest completions based on context (like Butterfish). Not just AI responses but proactive hints. | High | ZLE integration for real-time suggestions. Performance-sensitive. |
-| **MCP (Model Context Protocol)** | Extend AI capabilities with external tools. GitHub Copilot CLI supports this in 2026. | High | Growing ecosystem. Good for extensibility but not MVP. |
+| Feature                                                 | Value Proposition                                                                                                              | Complexity  | Notes                                                                                                                                |
+|---------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| **Intent detection (question vs command vs code task)** | Automatically detect if user wants: (a) question answered, (b) command generated, (c) file modified. No mode switching needed. | High        | Cherry2K's key differentiator. Use LLM classification or heuristics. Avoids "command processor not intent interpreter" anti-pattern. |
+| **Inline responses (not separate REPL)**                | Responses appear in-flow with normal terminal usage. No context switch to separate window.                                     | High        | Cherry2K's design choice. ZLE widget injection. More natural than Copilot CLI's separate prompt.                                     |
+| **File diff preview before apply**                      | Show unified diff of proposed changes, let user approve/reject. Cursor, Cline, Claude Code all do this.                        | Medium      | Use `similar` or custom diff. Show +/- lines with color.                                                                             |
+| **Multi-file awareness**                                | Understand project structure, not just current directory. Can modify related files together.                                   | High        | Requires indexing or "add files to context" command. Expensive token-wise.                                                           |
+| **Autonomous mode with guardrails**                     | Let AI run multiple commands in sequence (like Warp's "dispatch mode") but with safety checks.                                 | High        | Risky. Only for advanced users. Require explicit opt-in.                                                                             |
+| **Local-first with Ollama**                             | Privacy-conscious users can run entirely local. No data leaves machine.                                                        | Medium      | Ollama provider already planned. Emphasize in marketing.                                                                             |
+| **Cost-aware model selection**                          | Show token usage, let users pick cheaper models for simple tasks. "Which tool won't torch my credits?" is a 2026 concern.      | Medium      | Track tokens per request. Suggest model based on task complexity.                                                                    |
+| **Session persistence**                                 | Resume conversations across terminal restarts. "What was I working on yesterday?"                                              | Medium      | SQLite storage. Cherry2K already plans this.                                                                                         |
+| **Shell command suggestions**                           | As user types, suggest completions based on context (like Butterfish). Not just AI responses but proactive hints.              | High        | ZLE integration for real-time suggestions. Performance-sensitive.                                                                    |
+| **MCP (Model Context Protocol)**                        | Extend AI capabilities with external tools. GitHub Copilot CLI supports this in 2026.                                          | High        | Growing ecosystem. Good for extensibility but not MVP.                                                                               |
 
 ### Why These Differentiate
 
@@ -70,18 +70,18 @@ Features that set product apart. Not expected, but highly valued.
 
 Features to explicitly NOT build. Common mistakes in this domain.
 
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| **Auto-execution without confirmation** | Security risk. "Lies-in-the-Loop" attack shows approval can be manipulated. Even well-intentioned auto-exec causes disasters. JetBrains explicitly prevents this "by design." | Always show command, require explicit confirmation. Consider allowlist for safe commands only. |
-| **Over-engineered agent workflows** | 2026 sentiment: "Agentic AI delusion" - complex multi-step autonomy often fails unpredictably. Users report agent runs "waste money" and produce inconsistent results. | Keep it simple. One command at a time. Let user be the orchestrator. Agents are differentiator for later, not MVP. |
-| **Hallucinated package installation** | AI suggests `npm install fake-package`. Attacker registers that name. User gets pwned. Real 2026 security incident pattern. | Validate package names against registry before suggesting install. Warn on unknown packages. |
-| **Trying to be an IDE replacement** | Terminal AI should enhance terminal, not replace VS Code. Warp learned this - they complement Copilot, not compete. | Focus on CLI excellence. "If you need to write more app code, use Copilot in your editor. If you need to tame your terminal, use Cherry2K." |
-| **Feature bloat for "one size fits all"** | Reddit: "Tools that require constant correction quickly lose favor." Developers prefer specialized tools over all-in-one. | Do few things exceptionally well. Command generation, explanation, error analysis. Not code review, not PR creation, not CI/CD integration (yet). |
-| **Hiding command complexity** | Some tools hide what they're actually running. Users lose trust when AI does things they don't understand. | Always show the exact command before execution. Transparency builds trust. |
-| **Aggressive autocomplete** | Real-time suggestions that interrupt typing flow. Users report frustration with "AI that types for me." | Make suggestions opt-in via Tab or explicit shortcut. Don't inject into every keystroke. |
-| **Ignoring existing shell history** | AI that doesn't know user's past commands feels dumb. "Why is it suggesting ls when I just did find?" | Always include recent history in context. Shell integration should read `.zsh_history`. |
-| **Training on user commands** | Privacy concern. Users don't want their proprietary CLI workflows sent to cloud for training. | Be explicit about data handling. Local-first option. Clear privacy policy. |
-| **Subscription-only pricing** | 2026 trend: developers hate surprise costs. "Which tool won't torch my credits?" | Offer free tier with Ollama. Pay-as-you-go for cloud models. Transparent token usage. |
+| Anti-Feature                              | Why Avoid                                                                                                                                                                     | What to Do Instead                                                                                                                                |
+|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Auto-execution without confirmation**   | Security risk. "Lies-in-the-Loop" attack shows approval can be manipulated. Even well-intentioned auto-exec causes disasters. JetBrains explicitly prevents this "by design." | Always show command, require explicit confirmation. Consider allowlist for safe commands only.                                                    |
+| **Over-engineered agent workflows**       | 2026 sentiment: "Agentic AI delusion" - complex multi-step autonomy often fails unpredictably. Users report agent runs "waste money" and produce inconsistent results.        | Keep it simple. One command at a time. Let user be the orchestrator. Agents are differentiator for later, not MVP.                                |
+| **Hallucinated package installation**     | AI suggests `npm install fake-package`. Attacker registers that name. User gets pwned. Real 2026 security incident pattern.                                                   | Validate package names against registry before suggesting install. Warn on unknown packages.                                                      |
+| **Trying to be an IDE replacement**       | Terminal AI should enhance terminal, not replace VS Code. Warp learned this - they complement Copilot, not compete.                                                           | Focus on CLI excellence. "If you need to write more app code, use Copilot in your editor. If you need to tame your terminal, use Cherry2K."       |
+| **Feature bloat for "one size fits all"** | Reddit: "Tools that require constant correction quickly lose favor." Developers prefer specialized tools over all-in-one.                                                     | Do few things exceptionally well. Command generation, explanation, error analysis. Not code review, not PR creation, not CI/CD integration (yet). |
+| **Hiding command complexity**             | Some tools hide what they're actually running. Users lose trust when AI does things they don't understand.                                                                    | Always show the exact command before execution. Transparency builds trust.                                                                        |
+| **Aggressive autocomplete**               | Real-time suggestions that interrupt typing flow. Users report frustration with "AI that types for me."                                                                       | Make suggestions opt-in via Tab or explicit shortcut. Don't inject into every keystroke.                                                          |
+| **Ignoring existing shell history**       | AI that doesn't know user's past commands feels dumb. "Why is it suggesting ls when I just did find?"                                                                         | Always include recent history in context. Shell integration should read `.zsh_history`.                                                           |
+| **Training on user commands**             | Privacy concern. Users don't want their proprietary CLI workflows sent to cloud for training.                                                                                 | Be explicit about data handling. Local-first option. Clear privacy policy.                                                                        |
+| **Subscription-only pricing**             | 2026 trend: developers hate surprise costs. "Which tool won't torch my credits?"                                                                                              | Offer free tier with Ollama. Pay-as-you-go for cloud models. Transparent token usage.                                                             |
 
 ### Why These Are Anti-Features
 
@@ -201,14 +201,14 @@ For MVP, prioritize these **table stakes** to avoid users leaving immediately:
 
 ### Defer to Post-MVP
 
-| Feature | Reason to Defer |
-|---------|-----------------|
+| Feature              | Reason to Defer                   |
+|----------------------|-----------------------------------|
 | Multi-file awareness | Complex indexing, high token cost |
-| Autonomous mode | Safety concerns, not MVP priority |
-| MCP integration | Ecosystem still maturing |
-| Cost-aware selection | Nice to have, not essential |
-| Shell suggestions | Performance complexity |
-| TUI mode | Can start CLI-only |
+| Autonomous mode      | Safety concerns, not MVP priority |
+| MCP integration      | Ecosystem still maturing          |
+| Cost-aware selection | Nice to have, not essential       |
+| Shell suggestions    | Performance complexity            |
+| TUI mode             | Can start CLI-only                |
 
 ### MVP Success Criteria
 
@@ -225,33 +225,33 @@ User can:
 
 ### Cherry2K vs Warp
 
-| Aspect | Warp | Cherry2K |
-|--------|------|----------|
-| Integration | Full terminal replacement | Plugin for existing zsh |
-| Price | Freemium with paid tiers | Open source, BYO API key |
-| Local models | Limited | Full Ollama support |
-| Platform | macOS, Linux, Windows | zsh (any platform) |
+| Aspect       | Warp                      | Cherry2K                 |
+|--------------|---------------------------|--------------------------|
+| Integration  | Full terminal replacement | Plugin for existing zsh  |
+| Price        | Freemium with paid tiers  | Open source, BYO API key |
+| Local models | Limited                   | Full Ollama support      |
+| Platform     | macOS, Linux, Windows     | zsh (any platform)       |
 
 **Cherry2K advantage:** Users who love their existing terminal (iTerm2, kitty, Alacritty) don't want to switch. Cherry2K enhances, doesn't replace.
 
 ### Cherry2K vs Copilot CLI
 
-| Aspect | Copilot CLI | Cherry2K |
-|--------|-------------|----------|
-| Integration | Separate `copilot` command | Inline with `* ` prefix |
-| Provider | GitHub only | Multi-provider |
-| Subscription | Required | Optional (Ollama free) |
-| Edit command | Must re-prompt | Could allow direct edit |
+| Aspect       | Copilot CLI                | Cherry2K                |
+|--------------|----------------------------|-------------------------|
+| Integration  | Separate `copilot` command | Inline with `* ` prefix |
+| Provider     | GitHub only                | Multi-provider          |
+| Subscription | Required                   | Optional (Ollama free)  |
+| Edit command | Must re-prompt             | Could allow direct edit |
 
 **Cherry2K advantage:** Inline experience, provider flexibility, no subscription required.
 
 ### Cherry2K vs Claude Code
 
-| Aspect | Claude Code | Cherry2K |
-|--------|-------------|----------|
-| Focus | Full coding agent | Terminal assistant |
+| Aspect     | Claude Code          | Cherry2K            |
+|------------|----------------------|---------------------|
+| Focus      | Full coding agent    | Terminal assistant  |
 | Complexity | Planning + execution | Simple command flow |
-| Provider | Anthropic only | Multi-provider |
+| Provider   | Anthropic only       | Multi-provider      |
 
 **Cherry2K advantage:** Simpler, faster for quick terminal tasks. Claude Code is for complex multi-step work.
 
@@ -259,13 +259,13 @@ User can:
 
 ## Confidence Assessment
 
-| Category | Confidence | Reasoning |
-|----------|------------|-----------|
-| Table Stakes | HIGH | Verified across Warp, Copilot CLI, Claude Code, and multiple 2026 reviews |
-| Differentiators | HIGH | Based on gaps identified in competitor analysis |
-| Anti-Features | HIGH | Backed by security research, user complaints, developer reviews |
-| Dependencies | MEDIUM | Logical ordering but not verified against implementations |
-| MVP Rec | MEDIUM | Opinionated based on research, may need adjustment |
+| Category        | Confidence  | Reasoning                                                                 |
+|-----------------|-------------|---------------------------------------------------------------------------|
+| Table Stakes    | HIGH        | Verified across Warp, Copilot CLI, Claude Code, and multiple 2026 reviews |
+| Differentiators | HIGH        | Based on gaps identified in competitor analysis                           |
+| Anti-Features   | HIGH        | Backed by security research, user complaints, developer reviews           |
+| Dependencies    | MEDIUM      | Logical ordering but not verified against implementations                 |
+| MVP Rec         | MEDIUM      | Opinionated based on research, may need adjustment                        |
 
 ---
 
