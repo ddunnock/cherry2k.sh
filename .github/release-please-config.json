@@ -2,17 +2,17 @@
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "packages": {
     ".": {
-      "release-type": "rust",
+      "release-type": "simple",
       "package-name": "cherry2k",
       "changelog-path": "CHANGELOG.md",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
-      "draft": false,
-      "prerelease": false,
       "extra-files": [
-        "crates/core/Cargo.toml",
-        "crates/storage/Cargo.toml",
-        "crates/cli/Cargo.toml"
+        {
+          "type": "toml",
+          "path": "Cargo.toml",
+          "jsonpath": "$.workspace.package.version"
+        }
       ]
     }
   }

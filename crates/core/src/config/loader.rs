@@ -117,32 +117,49 @@ fn apply_env_overrides(config: &mut Config) {
 }
 
 #[cfg(test)]
+#[allow(unsafe_code)] // Required for env::set_var/remove_var in Rust 2024
 mod tests {
     use super::*;
     use std::io::Write;
     use tempfile::NamedTempFile;
 
+    // SAFETY: These tests run sequentially (cargo test runs each test in its own thread
+    // by default, but we're modifying process-global env vars). The unsafe blocks are
+    // required in Rust 2024 edition because env::set_var/remove_var can cause data races.
+
     #[test]
     fn test_default_config_when_no_file() {
         // Ensure no config file exists at test path
-        env::set_var("CHERRY2K_CONFIG_PATH", "/nonexistent/path/config.toml");
+        // SAFETY: Test environment, single-threaded test execution
+        unsafe {
+            env::set_var("CHERRY2K_CONFIG_PATH", "/nonexistent/path/config.toml");
+        }
         let config = load_config().unwrap();
         assert_eq!(config.general.default_provider, "openai");
         assert!(config.safety.confirm_commands);
-        env::remove_var("CHERRY2K_CONFIG_PATH");
+        // SAFETY: Cleanup after test
+        unsafe {
+            env::remove_var("CHERRY2K_CONFIG_PATH");
+        }
     }
 
     #[test]
     fn test_env_override() {
-        env::set_var("CHERRY2K_CONFIG_PATH", "/nonexistent/path/config.toml");
-        env::set_var("OPENAI_API_KEY", "test-key-123");
+        // SAFETY: Test environment, single-threaded test execution
+        unsafe {
+            env::set_var("CHERRY2K_CONFIG_PATH", "/nonexistent/path/config.toml");
+            env::set_var("OPENAI_API_KEY", "test-key-123");
+        }
         let config = load_config().unwrap();
         assert_eq!(
             config.openai.as_ref().unwrap().api_key,
             Some("test-key-123".to_string())
         );
-        env::remove_var("CHERRY2K_CONFIG_PATH");
-        env::remove_var("OPENAI_API_KEY");
+        // SAFETY: Cleanup after test
+        unsafe {
+            env::remove_var("CHERRY2K_CONFIG_PATH");
+            env::remove_var("OPENAI_API_KEY");
+        }
     }
 
     #[test]
@@ -161,12 +178,18 @@ confirm_commands = false
         )
         .unwrap();
 
-        env::set_var("CHERRY2K_CONFIG_PATH", file.path().to_str().unwrap());
+        // SAFETY: Test environment, single-threaded test execution
+        unsafe {
+            env::set_var("CHERRY2K_CONFIG_PATH", file.path().to_str().unwrap());
+        }
         let config = load_config().unwrap();
         assert_eq!(config.general.default_provider, "anthropic");
         assert_eq!(config.general.log_level, "debug");
         assert!(!config.safety.confirm_commands);
-        env::remove_var("CHERRY2K_CONFIG_PATH");
+        // SAFETY: Cleanup after test
+        unsafe {
+            env::remove_var("CHERRY2K_CONFIG_PATH");
+        }
     }
 
     #[test]
@@ -174,23 +197,34 @@ confirm_commands = false
         let mut file = NamedTempFile::new().unwrap();
         writeln!(file, "this is not valid toml {{{{").unwrap();
 
-        env::set_var("CHERRY2K_CONFIG_PATH", file.path().to_str().unwrap());
+        // SAFETY: Test environment, single-threaded test execution
+        unsafe {
+            env::set_var("CHERRY2K_CONFIG_PATH", file.path().to_str().unwrap());
+        }
         let result = load_config();
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), ConfigError::ParseError(_)));
-        env::remove_var("CHERRY2K_CONFIG_PATH");
+        // SAFETY: Cleanup after test
+        unsafe {
+            env::remove_var("CHERRY2K_CONFIG_PATH");
+        }
     }
 
     #[test]
     fn test_env_model_override_without_api_key() {
-        // Clean up any leftover env vars from other tests
-        env::remove_var("OPENAI_API_KEY");
-        env::remove_var("OPENAI_MODEL");
-        env::remove_var("OPENAI_BASE_URL");
+        // SAFETY: Cleanup any leftover env vars from other tests
+        unsafe {
+            env::remove_var("OPENAI_API_KEY");
+            env::remove_var("OPENAI_MODEL");
+            env::remove_var("OPENAI_BASE_URL");
+        }
 
         // Test that OPENAI_MODEL creates config even without OPENAI_API_KEY
-        env::set_var("CHERRY2K_CONFIG_PATH", "/nonexistent/path/config.toml");
-        env::set_var("OPENAI_MODEL", "gpt-4-turbo");
+        // SAFETY: Test environment, single-threaded test execution
+        unsafe {
+            env::set_var("CHERRY2K_CONFIG_PATH", "/nonexistent/path/config.toml");
+            env::set_var("OPENAI_MODEL", "gpt-4-turbo");
+        }
         let config = load_config().unwrap();
         assert!(config.openai.is_some(), "openai config should exist");
         assert_eq!(config.openai.as_ref().unwrap().model, "gpt-4-turbo");
@@ -199,7 +233,10 @@ confirm_commands = false
             config.openai.as_ref().unwrap().api_key.is_none(),
             "api_key should be None when only OPENAI_MODEL is set"
         );
-        env::remove_var("CHERRY2K_CONFIG_PATH");
-        env::remove_var("OPENAI_MODEL");
+        // SAFETY: Cleanup after test
+        unsafe {
+            env::remove_var("CHERRY2K_CONFIG_PATH");
+            env::remove_var("OPENAI_MODEL");
+        }
     }
 }

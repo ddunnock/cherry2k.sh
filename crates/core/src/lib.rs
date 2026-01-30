@@ -9,6 +9,6 @@ pub mod config;
 pub mod error;
 
 pub use config::{
-    load_config, AnthropicConfig, Config, GeneralConfig, OllamaConfig, OpenAiConfig, SafetyConfig,
+    AnthropicConfig, Config, GeneralConfig, OllamaConfig, OpenAiConfig, SafetyConfig, load_config,
 };
 pub use error::{CommandError, ConfigError, ProviderError, StorageError};
