@@ -5,6 +5,15 @@
 use anyhow::Result;
 use cherry2k_core::config::Config;
 
+/// Format API key status for display (never shows actual key).
+fn api_key_status(key: &Option<String>) -> &'static str {
+    if key.is_some() {
+        "configured"
+    } else {
+        "not set"
+    }
+}
+
 /// Show current configuration.
 pub fn run(config: &Config) -> Result<()> {
     println!("Cherry2K Configuration");
@@ -32,28 +41,14 @@ pub fn run(config: &Config) -> Result<()> {
         println!("[OpenAI]");
         println!("  Base URL: {}", openai.base_url);
         println!("  Model: {}", openai.model);
-        println!(
-            "  API key: {}",
-            if openai.api_key.is_some() {
-                "configured"
-            } else {
-                "not set"
-            }
-        );
+        println!("  API key: {}", api_key_status(&openai.api_key));
         println!();
     }
 
     if let Some(ref anthropic) = config.anthropic {
         println!("[Anthropic]");
         println!("  Model: {}", anthropic.model);
-        println!(
-            "  API key: {}",
-            if anthropic.api_key.is_some() {
-                "configured"
-            } else {
-                "not set"
-            }
-        );
+        println!("  API key: {}", api_key_status(&anthropic.api_key));
         println!();
     }
 

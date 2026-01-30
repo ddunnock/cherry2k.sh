@@ -99,8 +99,8 @@ pub fn confirm_file_operation(operation: &str, path: &str) -> io::Result<Confirm
 pub fn check_blocked_patterns<'a>(command: &str, patterns: &'a [String]) -> Option<&'a str> {
     patterns
         .iter()
-        .find(|pattern| command.contains(pattern.as_str()))
-        .map(|s| s.as_str())
+        .find(|p| command.contains(p.as_str()))
+        .map(String::as_str)
 }
 
 #[cfg(test)]

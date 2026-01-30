@@ -41,57 +41,63 @@ impl Default for GeneralConfig {
 
 /// OpenAI provider configuration
 #[derive(Debug, Clone, Deserialize)]
+#[serde(default)]
 pub struct OpenAiConfig {
     /// API key (prefer env var OPENAI_API_KEY)
     pub api_key: Option<String>,
     /// Base URL for API (default: <https://api.openai.com/v1>)
     /// Allows using OpenAI-compatible APIs
-    #[serde(default = "default_openai_base_url")]
     pub base_url: String,
     /// Model to use (default: gpt-4o)
-    #[serde(default = "default_openai_model")]
     pub model: String,
 }
 
-fn default_openai_base_url() -> String {
-    "https://api.openai.com/v1".to_string()
-}
-
-fn default_openai_model() -> String {
-    "gpt-4o".to_string()
+impl Default for OpenAiConfig {
+    fn default() -> Self {
+        Self {
+            api_key: None,
+            base_url: "https://api.openai.com/v1".to_string(),
+            model: "gpt-4o".to_string(),
+        }
+    }
 }
 
 /// Anthropic provider configuration
 #[derive(Debug, Clone, Deserialize)]
+#[serde(default)]
 pub struct AnthropicConfig {
     /// API key (prefer env var ANTHROPIC_API_KEY)
     pub api_key: Option<String>,
     /// Model to use (default: claude-sonnet-4-20250514)
-    #[serde(default = "default_anthropic_model")]
     pub model: String,
 }
 
-fn default_anthropic_model() -> String {
-    "claude-sonnet-4-20250514".to_string()
+impl Default for AnthropicConfig {
+    fn default() -> Self {
+        Self {
+            api_key: None,
+            model: "claude-sonnet-4-20250514".to_string(),
+        }
+    }
 }
 
 /// Ollama provider configuration
 #[derive(Debug, Clone, Deserialize)]
+#[serde(default)]
 pub struct OllamaConfig {
     /// Ollama host URL (default: <http://localhost:11434>)
-    #[serde(default = "default_ollama_host")]
     pub host: String,
     /// Model to use (default: llama3.2)
-    #[serde(default = "default_ollama_model")]
     pub model: String,
 }
 
-fn default_ollama_host() -> String {
-    "http://localhost:11434".to_string()
-}
-
-fn default_ollama_model() -> String {
-    "llama3.2".to_string()
+impl Default for OllamaConfig {
+    fn default() -> Self {
+        Self {
+            host: "http://localhost:11434".to_string(),
+            model: "llama3.2".to_string(),
+        }
+    }
 }
 
 /// Safety configuration for command execution
