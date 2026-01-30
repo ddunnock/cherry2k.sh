@@ -32,6 +32,9 @@ termimad = "0.30"
 colored = "3"
 reqwest-eventsource = "0.6"
 tokio-util = { version = "0.7", features = ["rt"] }
+rusqlite = { version = "0.37", features = ["bundled"] }
+tokio-rusqlite = "0.7"
+chrono = { version = "0.4", features = ["serde"] }
 
 [workspace.lints.rust]
 # Use "deny" instead of "forbid" to allow unsafe in test code

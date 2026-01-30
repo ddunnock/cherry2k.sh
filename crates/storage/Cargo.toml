@@ -9,6 +9,15 @@ description = "SQLite storage layer for Cherry2K"
 [dependencies]
 cherry2k-core = { path = "../core" }
 thiserror.workspace = true
+rusqlite.workspace = true
+tokio-rusqlite.workspace = true
+directories.workspace = true
+chrono.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [lints]
 workspace = true
