@@ -2,7 +2,8 @@
 //!
 //! Zsh terminal AI assistant with provider-agnostic architecture.
 
-use anyhow::Result;
+use anyhow::{Context, Result};
+use cherry2k_storage::Database;
 use clap::{Parser, Subcommand};
 use tracing_subscriber::EnvFilter;
 
@@ -36,6 +37,18 @@ enum Commands {
     },
     /// Show current configuration
     Config,
+    /// Resume a previous session or list sessions
+    Resume {
+        /// List all sessions instead of resuming
+        #[arg(short, long)]
+        list: bool,
+        /// Specific session ID to resume
+        session_id: Option<String>,
+    },
+    /// Start a new session (ignoring any existing session)
+    New,
+    /// Delete all sessions
+    Clear,
     /// Test Sentry integration (sends a test event)
     SentryTest {
         /// Trigger a panic to test panic handling
@@ -89,6 +102,26 @@ async fn main() -> Result<()> {
         }
         Commands::Config => {
             commands::config::run(&config)?;
+        }
+        Commands::Resume { list, session_id } => {
+            let db = Database::open()
+                .await
+                .context("Failed to open session database")?;
+            let working_dir = std::env::current_dir().context("Failed to get current directory")?;
+            commands::session::resume(&db, session_id.as_deref(), list, &working_dir).await?;
+        }
+        Commands::New => {
+            let db = Database::open()
+                .await
+                .context("Failed to open session database")?;
+            let working_dir = std::env::current_dir().context("Failed to get current directory")?;
+            commands::session::new_session(&db, &working_dir).await?;
+        }
+        Commands::Clear => {
+            let db = Database::open()
+                .await
+                .context("Failed to open session database")?;
+            commands::session::clear(&db).await?;
         }
         Commands::SentryTest { panic } => {
             if std::env::var("SENTRY_DSN").is_err() {
