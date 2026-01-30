@@ -184,11 +184,8 @@ mod tests {
 
     #[test]
     fn completion_stream_is_send() {
-        // CompletionStream must be Send for use across async tasks
-        fn _assert_send<T: Send>() {}
-        fn _check() {
-            _assert_send::<CompletionStream>();
-        }
+        fn assert_send<T: Send>() {}
+        assert_send::<CompletionStream>();
     }
 
     // A mock provider for testing trait bounds
