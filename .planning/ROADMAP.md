@@ -12,7 +12,7 @@ Cherry2K brings Warp-like AI assistance to any terminal through seamless zsh int
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation and Safety** - CLI skeleton with safe command execution architecture
+- [x] **Phase 1: Foundation and Safety** - CLI skeleton with safe command execution architecture
 - [ ] **Phase 2: Single Provider End-to-End** - OpenAI streaming responses working via CLI
 - [ ] **Phase 3: Storage and Session Continuity** - Conversation persistence and session resume
 - [ ] **Phase 4: Zsh Integration** - The `* ` prefix inline experience
@@ -35,9 +35,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md - Workspace structure and error types
-- [ ] 01-02-PLAN.md - Configuration loading with env var overrides
-- [ ] 01-03-PLAN.md - CLI skeleton with clap and confirmation flow
+- [x] 01-01-PLAN.md - Workspace structure and error types
+- [x] 01-02-PLAN.md - Configuration loading with env var overrides
+- [x] 01-03-PLAN.md - CLI skeleton with clap and confirmation flow
 
 ### Phase 2: Single Provider End-to-End
 **Goal**: Prove the core AI interaction flow with OpenAI-compatible API
@@ -148,7 +148,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation and Safety | 0/3 | Planned | - |
+| 1. Foundation and Safety | 3/3 | ✓ Complete | 2026-01-30 |
 | 2. Single Provider End-to-End | 0/3 | Not started | - |
 | 3. Storage and Session Continuity | 0/3 | Not started | - |
 | 4. Zsh Integration | 0/3 | Not started | - |
