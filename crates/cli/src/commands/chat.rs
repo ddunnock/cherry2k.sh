@@ -38,7 +38,9 @@ fn demonstrate_confirmation_flow(config: &Config) -> Result<()> {
     let suggested_command = "echo 'Hello from Cherry2K!'";
 
     // Check against blocked patterns first
-    if let Some(pattern) = confirm::check_blocked_patterns(suggested_command, &config.safety.blocked_patterns) {
+    if let Some(pattern) =
+        confirm::check_blocked_patterns(suggested_command, &config.safety.blocked_patterns)
+    {
         println!("BLOCKED: Command matches dangerous pattern: {}", pattern);
         return Ok(());
     }

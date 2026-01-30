@@ -18,8 +18,14 @@ pub fn run(config: &Config) -> Result<()> {
 
     println!("[Safety]");
     println!("  Confirm commands: {}", config.safety.confirm_commands);
-    println!("  Confirm file writes: {}", config.safety.confirm_file_writes);
-    println!("  Blocked patterns: {}", config.safety.blocked_patterns.len());
+    println!(
+        "  Confirm file writes: {}",
+        config.safety.confirm_file_writes
+    );
+    println!(
+        "  Blocked patterns: {}",
+        config.safety.blocked_patterns.len()
+    );
     println!();
 
     if let Some(ref openai) = config.openai {
