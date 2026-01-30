@@ -503,8 +503,8 @@ mod tests {
             // Get timestamp after first message
             let cutoff = Utc::now();
 
-            // Small delay
-            tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+            // Wait over 1 second since SQLite datetime('now') has second precision
+            tokio::time::sleep(std::time::Duration::from_millis(1100)).await;
 
             // Save another message
             save_message(&db, &session_id, Role::User, "New message", None)
