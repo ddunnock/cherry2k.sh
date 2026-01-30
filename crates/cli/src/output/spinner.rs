@@ -47,7 +47,8 @@ impl ResponseSpinner {
     ///
     /// Enables a steady tick at 100ms intervals for smooth animation.
     pub fn start(&self) {
-        self.progress_bar.enable_steady_tick(Duration::from_millis(100));
+        self.progress_bar
+            .enable_steady_tick(Duration::from_millis(100));
     }
 
     /// Stop and clear the spinner.

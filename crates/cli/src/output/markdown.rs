@@ -49,8 +49,7 @@ fn create_skin() -> MadSkin {
     skin.bold.set_fg(termimad::crossterm::style::Color::Yellow);
 
     // Italic: Cyan for subtle emphasis
-    skin.italic
-        .set_fg(termimad::crossterm::style::Color::Cyan);
+    skin.italic.set_fg(termimad::crossterm::style::Color::Cyan);
 
     // Inline code: Green on default background
     skin.inline_code
@@ -61,10 +60,8 @@ fn create_skin() -> MadSkin {
         .set_fg(termimad::crossterm::style::Color::Green);
 
     // Headers: Bold yellow
-    skin.headers[0]
-        .set_fg(termimad::crossterm::style::Color::Yellow);
-    skin.headers[1]
-        .set_fg(termimad::crossterm::style::Color::Yellow);
+    skin.headers[0].set_fg(termimad::crossterm::style::Color::Yellow);
+    skin.headers[1].set_fg(termimad::crossterm::style::Color::Yellow);
 
     // Bullet points: Use a nice character
     skin.bullet = StyledChar::from_fg_char(termimad::crossterm::style::Color::Cyan, '*');

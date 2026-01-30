@@ -263,10 +263,8 @@ mod tests {
 
         #[test]
         fn with_messages_adds_multiple() {
-            let req = CompletionRequest::new().with_messages([
-                Message::system("Be helpful"),
-                Message::user("Hello"),
-            ]);
+            let req = CompletionRequest::new()
+                .with_messages([Message::system("Be helpful"), Message::user("Hello")]);
 
             assert_eq!(req.messages.len(), 2);
             assert_eq!(req.messages[0].role, Role::System);
