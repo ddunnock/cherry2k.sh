@@ -32,12 +32,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Configuration loads from `~/.config/cherry2k/config.toml` or env vars
   4. Command confirmation flow exists (scaffolded for later use)
   5. Error types provide clear, actionable messages
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: Project structure and workspace setup
-- [ ] 01-02: Configuration loading and error handling
-- [ ] 01-03: CLI skeleton with clap and confirmation flow
+- [ ] 01-01-PLAN.md - Workspace structure and error types
+- [ ] 01-02-PLAN.md - Configuration loading with env var overrides
+- [ ] 01-03-PLAN.md - CLI skeleton with clap and confirmation flow
 
 ### Phase 2: Single Provider End-to-End
 **Goal**: Prove the core AI interaction flow with OpenAI-compatible API
@@ -148,7 +148,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation and Safety | 0/3 | Not started | - |
+| 1. Foundation and Safety | 0/3 | Planned | - |
 | 2. Single Provider End-to-End | 0/3 | Not started | - |
 | 3. Storage and Session Continuity | 0/3 | Not started | - |
 | 4. Zsh Integration | 0/3 | Not started | - |
