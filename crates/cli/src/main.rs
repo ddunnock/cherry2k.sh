@@ -9,6 +9,7 @@ use tracing_subscriber::EnvFilter;
 mod commands;
 mod confirm;
 pub mod output;
+pub mod signal;
 
 /// Cherry2K - Zsh Terminal AI Assistant
 #[derive(Parser)]

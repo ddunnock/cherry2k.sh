@@ -14,6 +14,8 @@ path = "src/main.rs"
 cherry2k-core = { path = "../core" }
 cherry2k-storage = { path = "../storage" }
 tokio.workspace = true
+tokio-util.workspace = true
+tokio-stream.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
