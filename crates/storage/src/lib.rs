@@ -35,9 +35,13 @@
 
 mod connection;
 mod schema;
+pub mod session;
 
 // Re-export the main types
 pub use connection::Database;
+
+// Re-export session types
+pub use session::{Session, SessionInfo};
 
 // Re-export core error types for convenience
 pub use cherry2k_core::StorageError;
