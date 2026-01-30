@@ -45,15 +45,15 @@ Plans:
 **Requirements**: PROV-01
 **Success Criteria** (what must be TRUE):
   1. User can run `cherry2k chat "What is Rust?"` and receive a streamed response
-  2. Response streams to terminal character-by-character (not buffered)
+  2. Response streams to terminal line-by-line (not buffered until complete)
   3. API errors surface as clear error messages (rate limit, invalid key, network)
   4. User can cancel mid-stream with Ctrl+C
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Provider trait design (OpenAI, Anthropic, Ollama in mind)
-- [ ] 02-02: OpenAI provider implementation with streaming
-- [ ] 02-03: Terminal output formatting and stream display
+- [ ] 02-01-PLAN.md - Provider trait and types (AiProvider, CompletionRequest)
+- [ ] 02-02-PLAN.md - Terminal output utilities (spinner, error box, markdown, stream writer)
+- [ ] 02-03-PLAN.md - OpenAI provider with SSE streaming and chat command integration
 
 ### Phase 3: Storage and Session Continuity
 **Goal**: Enable conversation context that persists across invocations
