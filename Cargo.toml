@@ -30,6 +30,8 @@ async-stream = "0.3"
 indicatif = "0.17"
 termimad = "0.30"
 colored = "3"
+reqwest-eventsource = "0.6"
+tokio-util = { version = "0.7", features = ["rt"] }
 
 [workspace.lints.rust]
 # Use "deny" instead of "forbid" to allow unsafe in test code

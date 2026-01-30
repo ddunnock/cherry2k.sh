@@ -29,4 +29,4 @@ pub use config::{
     AnthropicConfig, Config, GeneralConfig, OllamaConfig, OpenAiConfig, SafetyConfig, load_config,
 };
 pub use error::{CommandError, ConfigError, ProviderError, StorageError};
-pub use provider::{AiProvider, CompletionRequest, CompletionStream, Message, Role};
+pub use provider::{AiProvider, CompletionRequest, CompletionStream, Message, OpenAiProvider, Role};
