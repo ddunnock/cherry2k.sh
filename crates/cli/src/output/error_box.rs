@@ -136,9 +136,9 @@ fn format_provider_error(error: &ProviderError) -> String {
 /// Get the environment variable name for a provider's API key.
 fn provider_env_var(provider: &str) -> String {
     match provider.to_lowercase().as_str() {
-        "openai" => "OPENAI_API_KEY".to_string(),
-        "anthropic" => "ANTHROPIC_API_KEY".to_string(),
-        "ollama" => "OLLAMA_HOST".to_string(),
+        "openai" => "OPENAI_API_KEY".into(),
+        "anthropic" => "ANTHROPIC_API_KEY".into(),
+        "ollama" => "OLLAMA_HOST".into(),
         _ => format!("{}_API_KEY", provider.to_uppercase()),
     }
 }
@@ -147,26 +147,26 @@ fn provider_env_var(provider: &str) -> String {
 fn terminal_width() -> Option<usize> {
     // Try to get terminal size from environment or default
     // In the future, could use terminal_size crate
-    std::env::var("COLUMNS")
-        .ok()
-        .and_then(|s| s.parse().ok())
+    std::env::var("COLUMNS").ok().and_then(|s| s.parse().ok())
+}
+
+/// Generate a horizontal line of the given width.
+fn horizontal_line(width: usize) -> String {
+    std::iter::repeat_n(BOX_HORIZONTAL, width.saturating_sub(2)).collect()
 }
 
 /// Print the top border of the error box.
 fn print_top_border(width: usize) {
-    let horizontal_line: String = std::iter::repeat_n(BOX_HORIZONTAL, width - 2).collect();
-    eprintln!(
-        "{}",
-        format!("{BOX_TOP_LEFT}{horizontal_line}{BOX_TOP_RIGHT}").red()
-    );
+    let line = horizontal_line(width);
+    eprintln!("{}", format!("{BOX_TOP_LEFT}{line}{BOX_TOP_RIGHT}").red());
 }
 
 /// Print the bottom border of the error box.
 fn print_bottom_border(width: usize) {
-    let horizontal_line: String = std::iter::repeat_n(BOX_HORIZONTAL, width - 2).collect();
+    let line = horizontal_line(width);
     eprintln!(
         "{}",
-        format!("{BOX_BOTTOM_LEFT}{horizontal_line}{BOX_BOTTOM_RIGHT}").red()
+        format!("{BOX_BOTTOM_LEFT}{line}{BOX_BOTTOM_RIGHT}").red()
     );
 }
 
