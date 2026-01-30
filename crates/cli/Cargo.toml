@@ -20,6 +20,9 @@ tracing-subscriber.workspace = true
 clap.workspace = true
 sentry.workspace = true
 dotenvy.workspace = true
+indicatif.workspace = true
+termimad.workspace = true
+colored.workspace = true
 
 [lints]
 workspace = true
