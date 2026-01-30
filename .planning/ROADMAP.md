@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation and Safety** - CLI skeleton with safe command execution architecture
 - [x] **Phase 2: Single Provider End-to-End** - OpenAI streaming responses working via CLI
-- [ ] **Phase 3: Storage and Session Continuity** - Conversation persistence and session resume
+- [x] **Phase 3: Storage and Session Continuity** - Conversation persistence and session resume
 - [ ] **Phase 4: Zsh Integration** - The `* ` prefix inline experience
 - [ ] **Phase 5: Multi-Provider Support** - Anthropic, Ollama, and provider switching
 - [ ] **Phase 6: Command Execution Flow** - Intent detection and shell command execution
@@ -67,9 +67,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md - SQLite schema, migrations, and async connection wrapper
-- [ ] 03-02-PLAN.md - Session and message repository with CRUD operations
-- [ ] 03-03-PLAN.md - Context management, CLI integration, resume/new/clear commands
+- [x] 03-01-PLAN.md - SQLite schema, migrations, and async connection wrapper
+- [x] 03-02-PLAN.md - Session and message repository with CRUD operations
+- [x] 03-03-PLAN.md - Context management, CLI integration, resume/new/clear commands
 
 ### Phase 4: Zsh Integration
 **Goal**: Deliver the inline `* ` prefix experience that defines Cherry2K
@@ -150,7 +150,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 |-------|----------------|--------|-----------|
 | 1. Foundation and Safety | 3/3 | ✓ Complete | 2026-01-30 |
 | 2. Single Provider End-to-End | 3/3 | ✓ Complete | 2026-01-30 |
-| 3. Storage and Session Continuity | 0/3 | Not started | - |
+| 3. Storage and Session Continuity | 3/3 | ✓ Complete | 2026-01-30 |
 | 4. Zsh Integration | 0/3 | Not started | - |
 | 5. Multi-Provider Support | 0/3 | Not started | - |
 | 6. Command Execution Flow | 0/3 | Not started | - |
