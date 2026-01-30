@@ -1,14 +1,14 @@
 # CLAUDE.md
 
-> **Project**: Cherry2K.sh.sh - Zsh Terminal AI Assistant
-> **Language**: Rust (≥1.75)
+> **Project**: Cherry2K.sh - Zsh Terminal AI Assistant
+> **Language**: Rust (≥1.93, Edition 2024)
 > **Workflow**: Get Shit Done (GSD) Claude Code
 
 ---
 
 ## Overview
 
-Cherry2K.sh.sh is a zsh terminal-based AI assistant built in Rust with a provider-agnostic architecture. It supports multiple AI backends (OpenAI, Anthropic, Ollama) through a unified trait abstraction, uses SQLite for conversation persistence, and integrates into zsh via pure shell functions and ZLE widgets.
+Cherry2K.sh is a zsh terminal-based AI assistant built in Rust with a provider-agnostic architecture. It supports multiple AI backends (OpenAI, Anthropic, Ollama) through a unified trait abstraction, uses SQLite for conversation persistence, and integrates into zsh via pure shell functions and ZLE widgets.
 
 ## Quick Start
 
@@ -182,7 +182,7 @@ pub enum ProviderError {
 ### Async Patterns
 
 - Use `tokio` runtime for async operations
-- Implement `async fn` on traits (Rust 1.75+)
+- Native async traits (Rust 2024 edition)
 - Library code accepts executor, doesn't create runtime
 
 ### Security Requirements
@@ -271,13 +271,18 @@ test(cli): add integration tests for REPL
 
 ```toml
 [workspace.dependencies]
-tokio = { version = "1.35", features = ["full"] }
-reqwest = { version = "0.12", features = ["json", "stream"] }
-rusqlite = { version = "0.32", features = ["bundled"] }
-serde = { version = "1.0", features = ["derive"] }
-thiserror = "2.0"
-anyhow = "1.0"
-clap = { version = "4.5", features = ["derive"] }
+tokio = { version = "1.49", features = ["full"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+thiserror = "2.0.18"
+anyhow = "1.0.100"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
+toml = "0.9.11"
+directories = "6.0.0"
+clap = { version = "4.5.56", features = ["derive"] }
+sentry = { version = "0.46.1", features = ["backtrace", "contexts", "panic", "tracing", "reqwest", "rustls"] }
+dotenvy = "0.15.7"
 ```
 
 ## Environment Variables
@@ -332,4 +337,4 @@ OLLAMA_HOST=http://localhost:11434
 
 ---
 
-*Last updated: January 2026*
+*Last updated: 2026-01-30*

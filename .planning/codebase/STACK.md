@@ -5,7 +5,7 @@
 ## Languages
 
 **Primary:**
-- Rust 1.75+ (stable) - Core application logic, provider implementations, CLI
+- Rust 1.93+ (stable, Edition 2024) - Core application logic, provider implementations, CLI
 - Zsh - Terminal integration, widgets, completions
 
 **Secondary:**
@@ -15,8 +15,8 @@
 ## Runtime
 
 **Environment:**
-- Rust stable toolchain (1.75 or newer)
-- Tokio async runtime (1.35+)
+- Rust stable toolchain (1.93 or newer, Edition 2024)
+- Tokio async runtime (1.49+)
 
 **Package Manager:**
 - Cargo - Rust dependency management
@@ -25,17 +25,17 @@
 ## Frameworks
 
 **Core:**
-- Tokio 1.35 (full features) - Async runtime for concurrent operations
-- Reqwest 0.12 (json, stream features) - HTTP client for API calls to providers
+- Tokio 1.49 (full features) - Async runtime for concurrent operations
+- Reqwest (json, stream features) - HTTP client for API calls to providers
 
 **CLI:**
-- Clap 4.5 (derive features) - Command-line argument parsing
-- Tracing 0.1 + tracing-subscriber 0.3 (env-filter) - Structured logging framework
+- Clap 4.5.56 (derive features) - Command-line argument parsing
+- Tracing 0.1.44 + tracing-subscriber 0.3.22 (env-filter) - Structured logging framework
 
 **Data:**
-- Rusqlite 0.32 (bundled SQLite) - SQLite database access
-- Serde 1.0 (derive) - Serialization/deserialization
-- Serde JSON 1.0 - JSON handling
+- Serde 1.0.228 (derive) - Serialization/deserialization
+- Serde JSON 1.0.149 - JSON handling
+- TOML 0.9.11 - Configuration files
 
 **Async Utilities:**
 - Futures 0.3 - Stream abstractions for streaming responses
@@ -71,14 +71,14 @@
 - `Cargo.toml` (workspace root) - Workspace configuration with shared dependencies
 - `Cargo.toml` (per crate) - Individual crate metadata
 - `Cargo.lock` - Pinned dependency versions
-- `rustfmt.toml` - Code formatting (max_width: 100, Edition 2021)
+- `rustfmt.toml` - Code formatting (max_width: 100, Edition 2024)
 - `clippy.toml` - Linter configuration (cognitive-complexity: 25, etc.)
 
 ## Platform Requirements
 
 **Development:**
 - macOS or Linux
-- Rust 1.75+ (for building from source)
+- Rust 1.93+ (for building from source, Edition 2024)
 - SQLite 3 (on macOS: installed via Homebrew for native performance)
 - One API key: OpenAI (OPENAI_API_KEY=sk-*), Anthropic (ANTHROPIC_API_KEY=sk-ant-*), or Ollama running locally
 
@@ -96,12 +96,12 @@ members = ["crates/core", "crates/storage", "crates/cli"]
 
 [workspace.package]
 version = "0.1.0"
-edition = "2021"
-authors = ["David Dunnock"]
-license = "MIT"
+edition = "2024"
+authors = ["Cherry2K Contributors"]
+license = "AGPL-3.0"
 
 [workspace.dependencies]
-# Shared across all crates
+# Shared across all crates (see Cargo.toml for current versions)
 ```
 
 **Three crates:**
@@ -130,11 +130,11 @@ cargo audit --deny warnings    # No vulnerable dependencies
 
 ## Async Patterns
 
-- Native async traits (Rust 1.75+ feature, no async-trait crate)
+- Native async traits (Rust 2024 edition, no async-trait crate needed)
 - Streaming responses via `Pin<Box<dyn Stream<Item = Result<T, E>> + Send>>`
 - Tokio runtime created only in binary main.rs
 - Library functions are async-ready but don't create runtime
 
 ---
 
-*Stack analysis: 2026-01-29*
+*Stack analysis: 2026-01-29, updated 2026-01-30*
