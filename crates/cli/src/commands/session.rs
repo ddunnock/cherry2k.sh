@@ -43,7 +43,7 @@ pub async fn resume(
 
         println!("Sessions in {}:", working_dir.display());
         println!();
-        println!("{:<22} {:<22} {}", "ID", "Last Active", "Preview");
+        println!("{:<22} {:<22} Preview", "ID", "Last Active");
         println!("{}", "-".repeat(70));
 
         for session in sessions {

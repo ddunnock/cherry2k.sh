@@ -26,5 +26,8 @@ indicatif.workspace = true
 termimad.workspace = true
 colored.workspace = true
 
+[dev-dependencies]
+tempfile.workspace = true
+
 [lints]
 workspace = true

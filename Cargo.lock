@@ -207,6 +207,7 @@ dependencies = [
  "dotenvy",
  "indicatif",
  "sentry",
+ "tempfile",
  "termimad",
  "tokio",
  "tokio-stream",
