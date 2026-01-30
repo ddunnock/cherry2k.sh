@@ -60,6 +60,9 @@ fn init_sentry() -> sentry::ClientInitGuard {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Load .env file if present (ignore errors if not found)
+    let _ = dotenvy::dotenv();
+
     // Initialize Sentry first (before anything that might panic)
     let _sentry_guard = init_sentry();
 

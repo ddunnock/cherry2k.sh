@@ -22,6 +22,7 @@ directories = "5"
 tempfile = "3"
 clap = { version = "4.5", features = ["derive"] }
 sentry = { version = "0.35", default-features = false, features = ["backtrace", "contexts", "panic", "tracing", "reqwest", "rustls"] }
+dotenvy = "0.15"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
