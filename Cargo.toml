@@ -20,6 +20,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 toml = "0.8"
 directories = "5"
 tempfile = "3"
+clap = { version = "4.5", features = ["derive"] }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
