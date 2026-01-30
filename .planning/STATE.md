@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Seamless AI assistance without context switching - you stay in your terminal, in your flow.
-**Current focus:** Phase 3 - Storage and Session Continuity (in progress)
+**Current focus:** Phase 3 - Storage and Session Continuity (complete)
 
 ## Current Position
 
 Phase: 3 of 7 (Storage and Session Continuity)
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2026-01-30 - Completed 03-02-PLAN.md (Session and Message Repository)
+Plan: 3 of 3 in current phase
+Status: Phase complete
+Last activity: 2026-01-30 - Completed 03-03-PLAN.md (Session Integration and Context Management)
 
-Progress: [##########-----------] 50%
+Progress: [############---------] 57%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 3.3 min
-- Total execution time: 28 min
+- Total plans completed: 9
+- Average duration: 3.4 min
+- Total execution time: 33 min
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [##########-----------] 50%
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 7 min | 2.3 min |
 | 02-single-provider-e2e | 3 | 12 min | 4.0 min |
-| 03-storage-and-session-continuity | 2 | 9 min | 4.5 min |
+| 03-storage-and-session-continuity | 3 | 14 min | 4.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (4 min), 02-03 (5 min), 03-01 (5 min), 03-02 (4 min)
+- Last 5 plans: 02-03 (5 min), 03-01 (5 min), 03-02 (4 min), 03-03 (5 min)
 - Trend: Steady at ~4-5 min for moderate complexity plans
 
 *Updated after each plan completion*
@@ -73,6 +73,10 @@ Recent decisions affecting current work:
 - [03-02]: 4-hour idle threshold for session continuation
 - [03-02]: Atomic transaction for save_message (message + session timestamp)
 - [03-02]: Role stored as lowercase string, parsed on retrieval
+- [03-03]: 16K token budget with 75% threshold for summarization
+- [03-03]: 4 chars/token heuristic for token estimation
+- [03-03]: Response accumulation preserves streaming output
+- [03-03]: Probabilistic cleanup (~10%) to avoid per-chat performance impact
 
 ### Pending Todos
 
@@ -84,6 +88,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-30T23:30:58Z
-Stopped at: Completed 03-02-PLAN.md (Session and Message Repository)
+Last session: 2026-01-30T23:41:00Z
+Stopped at: Completed 03-03-PLAN.md (Session Integration and Context Management)
 Resume file: None
+Next: Phase 04 - Anthropic Provider
