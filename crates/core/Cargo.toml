@@ -9,6 +9,11 @@ description = "Core domain logic and provider abstraction for Cherry2K"
 [dependencies]
 thiserror.workspace = true
 serde.workspace = true
+toml.workspace = true
+directories.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [lints]
 workspace = true

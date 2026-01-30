@@ -1,0 +1,186 @@
+//! Configuration loading logic for Cherry2K
+
+use crate::config::types::*;
+use crate::error::ConfigError;
+use directories::ProjectDirs;
+use std::env;
+use std::fs;
+use std::path::PathBuf;
+
+/// Load configuration from file and environment variables.
+///
+/// Priority (highest to lowest):
+/// 1. Environment variables (OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.)
+/// 2. Config file (~/.config/cherry2k/config.toml or CHERRY2K_CONFIG_PATH)
+/// 3. Compiled defaults
+///
+/// # Errors
+/// Returns ConfigError if config file exists but is malformed.
+/// Missing config file is NOT an error - defaults are used.
+pub fn load_config() -> Result<Config, ConfigError> {
+    // Find config file path
+    let config_path = get_config_path();
+
+    // Load from file if exists
+    let mut config = if config_path.exists() {
+        let content = fs::read_to_string(&config_path).map_err(ConfigError::ReadError)?;
+        toml::from_str(&content).map_err(|e| ConfigError::ParseError(e.to_string()))?
+    } else {
+        Config::default()
+    };
+
+    // Apply environment variable overrides
+    apply_env_overrides(&mut config);
+
+    Ok(config)
+}
+
+/// Get the config file path.
+/// Uses CHERRY2K_CONFIG_PATH if set, otherwise ~/.config/cherry2k/config.toml
+pub fn get_config_path() -> PathBuf {
+    if let Ok(path) = env::var("CHERRY2K_CONFIG_PATH") {
+        return PathBuf::from(path);
+    }
+
+    if let Some(proj_dirs) = ProjectDirs::from("com", "cherry2k", "cherry2k") {
+        proj_dirs.config_dir().join("config.toml")
+    } else {
+        // Fallback if home directory detection fails
+        PathBuf::from("~/.config/cherry2k/config.toml")
+    }
+}
+
+/// Apply environment variable overrides to config.
+fn apply_env_overrides(config: &mut Config) {
+    // Log level override
+    if let Ok(level) = env::var("CHERRY2K_LOG_LEVEL") {
+        config.general.log_level = level;
+    }
+
+    // Default provider override
+    if let Ok(provider) = env::var("CHERRY2K_PROVIDER") {
+        config.general.default_provider = provider;
+    }
+
+    // OpenAI overrides
+    if let Ok(key) = env::var("OPENAI_API_KEY") {
+        let openai = config.openai.get_or_insert_with(|| OpenAiConfig {
+            api_key: None,
+            base_url: "https://api.openai.com/v1".to_string(),
+            model: "gpt-4o".to_string(),
+        });
+        openai.api_key = Some(key);
+    }
+    if let Ok(base_url) = env::var("OPENAI_BASE_URL") {
+        if let Some(ref mut openai) = config.openai {
+            openai.base_url = base_url;
+        }
+    }
+    if let Ok(model) = env::var("OPENAI_MODEL") {
+        if let Some(ref mut openai) = config.openai {
+            openai.model = model;
+        }
+    }
+
+    // Anthropic overrides
+    if let Ok(key) = env::var("ANTHROPIC_API_KEY") {
+        let anthropic = config.anthropic.get_or_insert_with(|| AnthropicConfig {
+            api_key: None,
+            model: "claude-sonnet-4-20250514".to_string(),
+        });
+        anthropic.api_key = Some(key);
+    }
+    if let Ok(model) = env::var("ANTHROPIC_MODEL") {
+        if let Some(ref mut anthropic) = config.anthropic {
+            anthropic.model = model;
+        }
+    }
+
+    // Ollama overrides
+    if let Ok(host) = env::var("OLLAMA_HOST") {
+        let ollama = config.ollama.get_or_insert_with(|| OllamaConfig {
+            host: "http://localhost:11434".to_string(),
+            model: "llama3.2".to_string(),
+        });
+        ollama.host = host;
+    }
+    if let Ok(model) = env::var("OLLAMA_MODEL") {
+        if let Some(ref mut ollama) = config.ollama {
+            ollama.model = model;
+        }
+    }
+
+    // Safety overrides (for testing/power users)
+    if let Ok(val) = env::var("CHERRY2K_CONFIRM_COMMANDS") {
+        config.safety.confirm_commands = val.parse().unwrap_or(true);
+    }
+    if let Ok(val) = env::var("CHERRY2K_CONFIRM_FILE_WRITES") {
+        config.safety.confirm_file_writes = val.parse().unwrap_or(true);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+    use tempfile::NamedTempFile;
+
+    #[test]
+    fn test_default_config_when_no_file() {
+        // Ensure no config file exists at test path
+        env::set_var("CHERRY2K_CONFIG_PATH", "/nonexistent/path/config.toml");
+        let config = load_config().unwrap();
+        assert_eq!(config.general.default_provider, "openai");
+        assert!(config.safety.confirm_commands);
+        env::remove_var("CHERRY2K_CONFIG_PATH");
+    }
+
+    #[test]
+    fn test_env_override() {
+        env::set_var("CHERRY2K_CONFIG_PATH", "/nonexistent/path/config.toml");
+        env::set_var("OPENAI_API_KEY", "test-key-123");
+        let config = load_config().unwrap();
+        assert_eq!(
+            config.openai.as_ref().unwrap().api_key,
+            Some("test-key-123".to_string())
+        );
+        env::remove_var("CHERRY2K_CONFIG_PATH");
+        env::remove_var("OPENAI_API_KEY");
+    }
+
+    #[test]
+    fn test_config_file_parsing() {
+        let mut file = NamedTempFile::new().unwrap();
+        writeln!(
+            file,
+            r#"
+[general]
+default_provider = "anthropic"
+log_level = "debug"
+
+[safety]
+confirm_commands = false
+"#
+        )
+        .unwrap();
+
+        env::set_var("CHERRY2K_CONFIG_PATH", file.path().to_str().unwrap());
+        let config = load_config().unwrap();
+        assert_eq!(config.general.default_provider, "anthropic");
+        assert_eq!(config.general.log_level, "debug");
+        assert!(!config.safety.confirm_commands);
+        env::remove_var("CHERRY2K_CONFIG_PATH");
+    }
+
+    #[test]
+    fn test_invalid_toml_returns_error() {
+        let mut file = NamedTempFile::new().unwrap();
+        writeln!(file, "this is not valid toml {{{{").unwrap();
+
+        env::set_var("CHERRY2K_CONFIG_PATH", file.path().to_str().unwrap());
+        let result = load_config();
+        assert!(result.is_err());
+        assert!(matches!(result.unwrap_err(), ConfigError::ParseError(_)));
+        env::remove_var("CHERRY2K_CONFIG_PATH");
+    }
+}
