@@ -4,12 +4,14 @@
 //! Supports spinner animation while waiting, line-buffered streaming output,
 //! and Ctrl+C cancellation with confirmation.
 
+use std::io::{self, Write};
+
 use anyhow::{Context, Result};
 use cherry2k_core::config::Config;
 use cherry2k_core::{AiProvider, CompletionRequest, Message, OpenAiProvider};
 use tokio_stream::StreamExt;
 
-use crate::output::{display_provider_error, ResponseSpinner, StreamWriter};
+use crate::output::{ResponseSpinner, StreamWriter, display_provider_error};
 use crate::signal::setup_cancellation;
 
 /// Run the chat command.
@@ -31,10 +33,9 @@ use crate::signal::setup_cancellation;
 /// - Network errors occur during streaming
 pub async fn run(config: &Config, message: &str, _plain: bool) -> Result<()> {
     // Get OpenAI config or error
-    let openai_config = config
-        .openai
-        .clone()
-        .ok_or_else(|| anyhow::anyhow!("OpenAI not configured. Set OPENAI_API_KEY environment variable."))?;
+    let openai_config = config.openai.clone().ok_or_else(|| {
+        anyhow::anyhow!("OpenAI not configured. Set OPENAI_API_KEY environment variable.")
+    })?;
 
     // Create and validate provider
     let provider = OpenAiProvider::new(openai_config);
@@ -66,6 +67,7 @@ pub async fn run(config: &Config, message: &str, _plain: bool) -> Result<()> {
     spinner.stop();
     println!(); // Blank line before response
     print!("\u{25B6} "); // Subtle icon prefix (black right-pointing triangle)
+    io::stdout().flush()?;
 
     // Stream response with cancellation support
     let mut writer = StreamWriter::new();
