@@ -34,12 +34,16 @@
 //! to protect conversation history.
 
 mod connection;
+pub mod context;
 pub mod message;
 mod schema;
 pub mod session;
 
 // Re-export the main types
 pub use connection::Database;
+
+// Re-export context types
+pub use context::{prepare_context, ContextResult};
 
 // Re-export session types
 pub use session::{Session, SessionInfo};

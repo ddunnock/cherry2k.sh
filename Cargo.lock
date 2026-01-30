@@ -241,6 +241,7 @@ dependencies = [
  "cherry2k-core",
  "chrono",
  "directories",
+ "futures",
  "rusqlite",
  "tempfile",
  "thiserror 2.0.18",
