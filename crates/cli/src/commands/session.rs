@@ -71,9 +71,7 @@ pub async fn resume(
 
     if let Some(id) = session_id {
         // Resume specific session
-        let session = get_session(db, id)
-            .await
-            .context("Failed to get session")?;
+        let session = get_session(db, id).await.context("Failed to get session")?;
 
         match session {
             Some(s) => {
@@ -145,21 +143,10 @@ pub async fn clear(db: &Database) -> Result<()> {
         return Ok(());
     }
 
-    // Get all sessions and delete them
-    // We need to iterate through directories, but for simplicity we'll just
-    // clean up old sessions and delete the database file
-    // Actually, let's use a more targeted approach - delete sessions by listing them
-
-    // For now, use cleanup with a future timestamp to delete everything
-    // This is a bit of a hack - we should add a delete_all_sessions function
-    // But we can use the cleanup function with a very recent threshold
-
-    // Actually, let's just count sessions in common directories and delete them
-    // For a simpler approach, we'll query all session IDs directly
-
     let count = db
         .call(|conn| {
-            let count: i64 = conn.query_row("SELECT COUNT(*) FROM sessions", [], |row| row.get(0))?;
+            let count: i64 =
+                conn.query_row("SELECT COUNT(*) FROM sessions", [], |row| row.get(0))?;
             if count > 0 {
                 conn.execute("DELETE FROM messages", [])?;
                 conn.execute("DELETE FROM sessions", [])?;
