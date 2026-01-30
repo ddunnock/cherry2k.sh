@@ -31,6 +31,12 @@ enum Commands {
     },
     /// Show current configuration
     Config,
+    /// Test Sentry integration (sends a test event)
+    SentryTest {
+        /// Trigger a panic to test panic handling
+        #[arg(long)]
+        panic: bool,
+    },
 }
 
 /// Initialize Sentry error tracking.
@@ -75,6 +81,25 @@ async fn main() -> Result<()> {
         }
         Commands::Config => {
             commands::config::run(&config)?;
+        }
+        Commands::SentryTest { panic } => {
+            if std::env::var("SENTRY_DSN").is_err() {
+                println!("SENTRY_DSN not set - Sentry is inactive");
+                println!("Set SENTRY_DSN environment variable to enable");
+                return Ok(());
+            }
+
+            println!("Sending test event to Sentry...");
+            sentry::capture_message("Cherry2K test event", sentry::Level::Info);
+
+            if panic {
+                println!("Triggering test panic...");
+                panic!("Cherry2K test panic - this is intentional!");
+            }
+
+            // Give Sentry time to send the event
+            std::thread::sleep(std::time::Duration::from_secs(2));
+            println!("Test event sent! Check your Sentry dashboard.");
         }
     }
 
