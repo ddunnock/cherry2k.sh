@@ -171,19 +171,23 @@ fn print_bottom_border(width: usize) {
 }
 
 /// Print a content line with side borders.
+///
+/// Uses character-aware truncation to avoid panics on multi-byte UTF-8 characters.
 fn print_content_line(content: &str, inner_width: usize) {
-    // Truncate or pad content to fit
-    let display_content = if content.len() > inner_width {
-        &content[..inner_width]
+    // Truncate or pad content to fit (character-aware to handle UTF-8 safely)
+    let display_content: String = if content.chars().count() > inner_width {
+        content.chars().take(inner_width).collect()
     } else {
-        content
+        content.to_string()
     };
-    let padding = inner_width.saturating_sub(display_content.len());
+    let padding = inner_width.saturating_sub(display_content.chars().count());
     let padding_str = " ".repeat(padding);
 
     eprintln!(
-        "{} {display_content}{padding_str} {}",
+        "{} {}{} {}",
         format!("{BOX_VERTICAL}").red(),
+        display_content,
+        padding_str,
         format!("{BOX_VERTICAL}").red()
     );
 }
@@ -239,5 +243,22 @@ mod tests {
         let message = format_provider_error(&error);
         assert!(message.contains("Provider Unavailable"));
         assert!(message.contains("service maintenance"));
+    }
+
+    #[test]
+    fn print_content_line_handles_utf8() {
+        // Test that multi-byte UTF-8 characters don't cause panics
+        // The function prints to stderr, so we just verify it doesn't panic
+        print_content_line("Hello 世界! 🎉 émojis", 10);
+        print_content_line("日本語テスト", 5);
+        print_content_line("Ñoño señor", 20);
+    }
+
+    #[test]
+    fn print_content_line_truncates_correctly() {
+        // Verify character-based truncation works
+        let content = "Hello 世界";
+        // "Hello 世界" is 8 characters, should not panic when truncating to 5
+        print_content_line(content, 5);
     }
 }
