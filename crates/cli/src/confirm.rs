@@ -73,6 +73,8 @@ pub fn confirm(prompt: &str, allow_edit: bool) -> io::Result<ConfirmResult> {
 ///
 /// Displays the command and asks for confirmation.
 /// Returns the user's choice (Yes, No, or Edit).
+/// Note: Used in Phase 6 (Command Execution).
+#[allow(dead_code)]
 pub fn confirm_command(command: &str) -> io::Result<ConfirmResult> {
     println!();
     println!("Suggested command:");
@@ -96,6 +98,8 @@ pub fn confirm_file_operation(operation: &str, path: &str) -> io::Result<Confirm
 /// Check if a command matches any blocked patterns.
 ///
 /// Returns Some(pattern) if blocked, None if allowed.
+/// Note: Used in Phase 6 (Command Execution).
+#[allow(dead_code)]
 pub fn check_blocked_patterns<'a>(command: &str, patterns: &'a [String]) -> Option<&'a str> {
     patterns
         .iter()

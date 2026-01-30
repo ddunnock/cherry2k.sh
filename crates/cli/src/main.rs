@@ -30,6 +30,9 @@ enum Commands {
     Chat {
         /// The message to send to the AI
         message: String,
+        /// Output plain text without markdown rendering
+        #[arg(short, long)]
+        plain: bool,
     },
     /// Show current configuration
     Config,
@@ -81,8 +84,8 @@ async fn main() -> Result<()> {
 
     // Dispatch to command handlers
     match cli.command {
-        Commands::Chat { message } => {
-            commands::chat::run(&config, &message).await?;
+        Commands::Chat { message, plain } => {
+            commands::chat::run(&config, &message, plain).await?;
         }
         Commands::Config => {
             commands::config::run(&config)?;

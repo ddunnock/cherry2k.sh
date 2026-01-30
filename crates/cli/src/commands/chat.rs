@@ -1,73 +1,103 @@
 //! Chat command handler
 //!
-//! Sends a one-shot query to the configured AI provider.
-//! Currently a placeholder - Phase 2 will add actual provider integration.
+//! Sends a one-shot query to the configured AI provider and streams the response.
+//! Supports spinner animation while waiting, line-buffered streaming output,
+//! and Ctrl+C cancellation with confirmation.
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use cherry2k_core::config::Config;
+use cherry2k_core::{AiProvider, CompletionRequest, Message, OpenAiProvider};
+use tokio_stream::StreamExt;
 
-use crate::confirm::{self, ConfirmResult};
+use crate::output::{display_provider_error, ResponseSpinner, StreamWriter};
+use crate::signal::setup_cancellation;
 
 /// Run the chat command.
 ///
-/// Currently a placeholder that demonstrates the confirmation flow.
-/// Phase 2 will add actual provider integration.
-pub async fn run(config: &Config, message: &str) -> Result<()> {
-    println!("Cherry2K Chat");
-    println!("=============");
-    println!();
-    println!("Provider: {}", config.general.default_provider);
-    println!("Message: \"{}\"", message);
-    println!();
-    println!("[Phase 2 will add AI provider integration]");
-    println!();
+/// Sends the message to the configured AI provider and streams the response
+/// to the terminal with line buffering for smooth output.
+///
+/// # Arguments
+///
+/// * `config` - Application configuration
+/// * `message` - The user's message to send to the AI
+/// * `_plain` - If true, skip markdown rendering (currently unused, for future enhancement)
+///
+/// # Errors
+///
+/// Returns an error if:
+/// - OpenAI is not configured (missing API key)
+/// - The API request fails
+/// - Network errors occur during streaming
+pub async fn run(config: &Config, message: &str, _plain: bool) -> Result<()> {
+    // Get OpenAI config or error
+    let openai_config = config
+        .openai
+        .clone()
+        .ok_or_else(|| anyhow::anyhow!("OpenAI not configured. Set OPENAI_API_KEY environment variable."))?;
 
-    // Demonstrate the confirmation flow (scaffolded for Phase 6)
-    // This simulates what happens when AI suggests a command
-    demonstrate_confirmation_flow(config)?;
+    // Create and validate provider
+    let provider = OpenAiProvider::new(openai_config);
+    provider
+        .validate_config()
+        .context("Invalid OpenAI configuration")?;
 
-    Ok(())
-}
+    // Build request
+    let request = CompletionRequest::new().with_message(Message::user(message));
 
-/// Demonstrate the confirmation flow that will be used for command execution.
-fn demonstrate_confirmation_flow(config: &Config) -> Result<()> {
-    println!("--- Confirmation Flow Demo ---");
-    println!();
+    // Setup cancellation handler
+    let cancel_token = setup_cancellation();
 
-    // Example: AI would suggest this command
-    let suggested_command = "echo 'Hello from Cherry2K!'";
+    // Show spinner while waiting for initial response
+    let spinner = ResponseSpinner::new();
+    spinner.start();
 
-    // Check against blocked patterns first
-    if let Some(pattern) =
-        confirm::check_blocked_patterns(suggested_command, &config.safety.blocked_patterns)
-    {
-        println!("BLOCKED: Command matches dangerous pattern: {}", pattern);
-        return Ok(());
-    }
+    // Get stream from provider
+    let stream = match provider.complete(request).await {
+        Ok(s) => s,
+        Err(e) => {
+            spinner.stop();
+            display_provider_error(&e);
+            return Err(e.into());
+        }
+    };
 
-    // If confirmation is enabled, ask user
-    if config.safety.confirm_commands {
-        match confirm::confirm_command(suggested_command)? {
-            ConfirmResult::Yes => {
-                println!();
-                println!("User confirmed. [Would execute in Phase 6]");
+    // Stop spinner and prepare for streaming output
+    spinner.stop();
+    println!(); // Blank line before response
+    print!("\u{25B6} "); // Subtle icon prefix (black right-pointing triangle)
+
+    // Stream response with cancellation support
+    let mut writer = StreamWriter::new();
+    tokio::pin!(stream);
+
+    loop {
+        tokio::select! {
+            chunk = stream.next() => {
+                match chunk {
+                    Some(Ok(text)) => {
+                        writer.write_chunk(&text)?;
+                    }
+                    Some(Err(e)) => {
+                        writer.flush()?;
+                        println!();
+                        display_provider_error(&e);
+                        return Err(e.into());
+                    }
+                    None => break, // Stream ended
+                }
             }
-            ConfirmResult::No => {
-                println!();
-                println!("User cancelled.");
-            }
-            ConfirmResult::Edit => {
-                println!();
-                println!("User wants to edit. [Would open editor in Phase 6]");
+            _ = cancel_token.cancelled() => {
+                writer.flush()?;
+                println!("\n\nCancelled by user.");
+                return Ok(());
             }
         }
-    } else {
-        println!("(Confirmation disabled - would auto-execute)");
-        println!("Command: {}", suggested_command);
     }
 
-    println!();
-    println!("--- End Demo ---");
+    // Flush any remaining buffered content
+    writer.flush()?;
+    println!(); // Blank line after response
 
     Ok(())
 }
