@@ -99,6 +99,14 @@ pub enum StorageError {
     #[error("Migration failed: {0}")]
     Migration(String),
 
+    /// I/O error (file operations, permissions)
+    #[error("I/O error: {0}")]
+    IoError(String),
+
+    /// Home directory not found (XDG directories unavailable)
+    #[error("Could not determine home directory for database path")]
+    NoHomeDir,
+
     /// Conversation not found
     #[error("Conversation not found: {id}")]
     ConversationNotFound {
