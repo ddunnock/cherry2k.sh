@@ -33,11 +33,33 @@ enum Commands {
     Config,
 }
 
+/// Initialize Sentry error tracking.
+///
+/// Returns a guard that must be kept alive for the duration of the program.
+/// Sentry is only active if SENTRY_DSN environment variable is set.
+fn init_sentry() -> sentry::ClientInitGuard {
+    sentry::init((
+        std::env::var("SENTRY_DSN").ok(),
+        sentry::ClientOptions {
+            release: sentry::release_name!(),
+            environment: std::env::var("SENTRY_ENVIRONMENT")
+                .ok()
+                .map(std::borrow::Cow::Owned),
+            // Capture 100% of transactions for tracing (adjust in production)
+            traces_sample_rate: 1.0,
+            ..Default::default()
+        },
+    ))
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Initialize Sentry first (before anything that might panic)
+    let _sentry_guard = init_sentry();
+
     let cli = Cli::parse();
 
-    // Initialize logging
+    // Initialize logging with Sentry integration
     let filter =
         EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(&cli.log_level));
     tracing_subscriber::fmt().with_env_filter(filter).init();
