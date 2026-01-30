@@ -45,8 +45,8 @@ pub fn get_config_path() -> PathBuf {
     if let Some(proj_dirs) = ProjectDirs::from("com", "cherry2k", "cherry2k") {
         proj_dirs.config_dir().join("config.toml")
     } else {
-        // Fallback if home directory detection fails
-        PathBuf::from("~/.config/cherry2k/config.toml")
+        // Fallback if home directory detection fails - use current directory
+        PathBuf::from(".cherry2k/config.toml")
     }
 }
 
@@ -64,50 +64,47 @@ fn apply_env_overrides(config: &mut Config) {
 
     // OpenAI overrides
     if let Ok(key) = env::var("OPENAI_API_KEY") {
-        let openai = config.openai.get_or_insert_with(|| OpenAiConfig {
-            api_key: None,
-            base_url: "https://api.openai.com/v1".to_string(),
-            model: "gpt-4o".to_string(),
-        });
-        openai.api_key = Some(key);
+        config
+            .openai
+            .get_or_insert_with(OpenAiConfig::default)
+            .api_key = Some(key);
     }
     if let Ok(base_url) = env::var("OPENAI_BASE_URL") {
-        if let Some(ref mut openai) = config.openai {
-            openai.base_url = base_url;
-        }
+        config
+            .openai
+            .get_or_insert_with(OpenAiConfig::default)
+            .base_url = base_url;
     }
     if let Ok(model) = env::var("OPENAI_MODEL") {
-        if let Some(ref mut openai) = config.openai {
-            openai.model = model;
-        }
+        config
+            .openai
+            .get_or_insert_with(OpenAiConfig::default)
+            .model = model;
     }
 
     // Anthropic overrides
     if let Ok(key) = env::var("ANTHROPIC_API_KEY") {
-        let anthropic = config.anthropic.get_or_insert_with(|| AnthropicConfig {
-            api_key: None,
-            model: "claude-sonnet-4-20250514".to_string(),
-        });
-        anthropic.api_key = Some(key);
+        config
+            .anthropic
+            .get_or_insert_with(AnthropicConfig::default)
+            .api_key = Some(key);
     }
     if let Ok(model) = env::var("ANTHROPIC_MODEL") {
-        if let Some(ref mut anthropic) = config.anthropic {
-            anthropic.model = model;
-        }
+        config
+            .anthropic
+            .get_or_insert_with(AnthropicConfig::default)
+            .model = model;
     }
 
     // Ollama overrides
     if let Ok(host) = env::var("OLLAMA_HOST") {
-        let ollama = config.ollama.get_or_insert_with(|| OllamaConfig {
-            host: "http://localhost:11434".to_string(),
-            model: "llama3.2".to_string(),
-        });
-        ollama.host = host;
+        config.ollama.get_or_insert_with(OllamaConfig::default).host = host;
     }
     if let Ok(model) = env::var("OLLAMA_MODEL") {
-        if let Some(ref mut ollama) = config.ollama {
-            ollama.model = model;
-        }
+        config
+            .ollama
+            .get_or_insert_with(OllamaConfig::default)
+            .model = model;
     }
 
     // Safety overrides (for testing/power users)
@@ -182,5 +179,27 @@ confirm_commands = false
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), ConfigError::ParseError(_)));
         env::remove_var("CHERRY2K_CONFIG_PATH");
+    }
+
+    #[test]
+    fn test_env_model_override_without_api_key() {
+        // Clean up any leftover env vars from other tests
+        env::remove_var("OPENAI_API_KEY");
+        env::remove_var("OPENAI_MODEL");
+        env::remove_var("OPENAI_BASE_URL");
+
+        // Test that OPENAI_MODEL creates config even without OPENAI_API_KEY
+        env::set_var("CHERRY2K_CONFIG_PATH", "/nonexistent/path/config.toml");
+        env::set_var("OPENAI_MODEL", "gpt-4-turbo");
+        let config = load_config().unwrap();
+        assert!(config.openai.is_some(), "openai config should exist");
+        assert_eq!(config.openai.as_ref().unwrap().model, "gpt-4-turbo");
+        // api_key should be None since we only set OPENAI_MODEL
+        assert!(
+            config.openai.as_ref().unwrap().api_key.is_none(),
+            "api_key should be None when only OPENAI_MODEL is set"
+        );
+        env::remove_var("CHERRY2K_CONFIG_PATH");
+        env::remove_var("OPENAI_MODEL");
     }
 }
