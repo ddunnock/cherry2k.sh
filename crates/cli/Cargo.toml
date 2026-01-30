@@ -1,0 +1,22 @@
+[package]
+name = "cherry2k"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Zsh terminal AI assistant"
+
+[[bin]]
+name = "cherry2k"
+path = "src/main.rs"
+
+[dependencies]
+cherry2k-core = { path = "../core" }
+cherry2k-storage = { path = "../storage" }
+tokio.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[lints]
+workspace = true
