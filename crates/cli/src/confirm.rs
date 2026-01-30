@@ -84,6 +84,8 @@ pub fn confirm_command(command: &str) -> io::Result<ConfirmResult> {
 /// Confirm a file operation before execution.
 ///
 /// Displays the operation details and asks for confirmation.
+/// Note: Used in Phase 7 (File Operations).
+#[allow(dead_code)]
 pub fn confirm_file_operation(operation: &str, path: &str) -> io::Result<ConfirmResult> {
     println!();
     println!("{}: {}", operation, path);
