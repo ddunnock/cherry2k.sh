@@ -37,9 +37,9 @@ use reqwest::Client;
 use reqwest_eventsource::{Event, EventSource, RequestBuilderExt};
 use serde::Serialize;
 
+use super::AiProvider;
 use super::sse::parse_sse_chunk;
 use super::types::{CompletionRequest, Message};
-use super::AiProvider;
 use crate::config::OpenAiConfig;
 use crate::error::{ConfigError, ProviderError};
 
@@ -246,13 +246,6 @@ fn create_completion_stream(
                 }
             }
         }
-    }
-}
-
-// Implement From for reqwest_eventsource::Error to ProviderError
-impl From<reqwest_eventsource::Error> for ProviderError {
-    fn from(e: reqwest_eventsource::Error) -> Self {
-        ProviderError::RequestFailed(e.to_string())
     }
 }
 
