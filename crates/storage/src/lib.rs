@@ -34,6 +34,7 @@
 //! to protect conversation history.
 
 mod connection;
+pub mod message;
 mod schema;
 pub mod session;
 
@@ -42,6 +43,9 @@ pub use connection::Database;
 
 // Re-export session types
 pub use session::{Session, SessionInfo};
+
+// Re-export message types
+pub use message::StoredMessage;
 
 // Re-export core error types for convenience
 pub use cherry2k_core::StorageError;
