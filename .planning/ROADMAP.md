@@ -64,12 +64,12 @@ Plans:
   2. Conversation persists after terminal closes
   3. User can resume a previous session with `cherry2k resume`
   4. Context window managed (old messages summarized or pruned)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: SQLite schema and migrations
-- [ ] 03-02: Repository layer with async-safe access
-- [ ] 03-03: Session management and context window handling
+- [ ] 03-01-PLAN.md - SQLite schema, migrations, and async connection wrapper
+- [ ] 03-02-PLAN.md - Session and message repository with CRUD operations
+- [ ] 03-03-PLAN.md - Context management, CLI integration, resume/new/clear commands
 
 ### Phase 4: Zsh Integration
 **Goal**: Deliver the inline `* ` prefix experience that defines Cherry2K
