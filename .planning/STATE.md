@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 4 of 7 (Zsh Integration)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-01-31 - Completed 04-01-PLAN.md (AI Mode Widget Infrastructure)
+Last activity: 2026-01-31 - Completed 04-02-PLAN.md (AI Invocation and Response Streaming)
 
-Progress: [#############--------] 63%
+Progress: [##############-------] 69%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 3.3 min
-- Total execution time: 36 min
+- Total plans completed: 11
+- Average duration: 3.5 min
+- Total execution time: 41 min
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [#############--------] 63%
 | 01-foundation | 3 | 7 min | 2.3 min |
 | 02-single-provider-e2e | 3 | 12 min | 4.0 min |
 | 03-storage-and-session-continuity | 3 | 14 min | 4.7 min |
-| 04-zsh-integration | 1 | 3 min | 3.0 min |
+| 04-zsh-integration | 2 | 8 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (5 min), 03-02 (4 min), 03-03 (5 min), 04-01 (3 min)
+- Last 5 plans: 03-02 (4 min), 03-03 (5 min), 04-01 (3 min), 04-02 (5 min)
 - Trend: Steady at ~3-5 min for moderate complexity plans
 
 *Updated after each plan completion*
@@ -81,6 +81,11 @@ Recent decisions affecting current work:
 - [04-01]: Use .self-insert for builtin widget reference (dot prefix avoids recursion)
 - [04-01]: Separate backward-delete-char wrapper for exit detection
 - [04-01]: Unicode escape $'\U1F352' for cherry emoji in prompt
+- [04-02]: JSON context via temp file (handles escaping, large history)
+- [04-02]: jq dependency for reliable JSON string escaping in zsh
+- [04-02]: History prevention via BUFFER="" before accept-line
+- [04-02]: ANSI escape codes in StreamWriter for retro green color
+- [04-02]: Drop impl on StreamWriter for color reset on interruption
 
 ### Pending Todos
 
@@ -89,10 +94,11 @@ Recent decisions affecting current work:
 ### Blockers/Concerns
 
 - [Research] macOS seatbelt vs Linux bubblewrap sandboxing needs platform research during Phase 1
+- [04-02] jq is a required dependency for context collection - document in install instructions
 
 ## Session Continuity
 
-Last session: 2026-01-31T18:38:00Z
-Stopped at: Completed 04-01-PLAN.md (AI Mode Widget Infrastructure)
+Last session: 2026-01-31T18:47:05Z
+Stopped at: Completed 04-02-PLAN.md (AI Invocation and Response Streaming)
 Resume file: None
-Next: 04-02-PLAN.md (AI Invocation and Response Streaming)
+Next: 04-03-PLAN.md (Keybindings and Completions)
