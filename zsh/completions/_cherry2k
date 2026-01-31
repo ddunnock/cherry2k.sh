@@ -1,0 +1,63 @@
+#compdef cherry2k
+
+# Cherry2K completion definitions
+# Generated from clap CLI structure
+
+_cherry2k() {
+    local -a commands
+    commands=(
+        'chat:Chat with AI (one-shot query)'
+        'config:Show current configuration'
+        'resume:Resume a previous session or list sessions'
+        'new:Start a new session'
+        'clear:Delete all sessions'
+        'sentry-test:Test Sentry integration'
+    )
+
+    local -a global_opts
+    global_opts=(
+        '-l[Set log level]:level:(trace debug info warn error)'
+        '--log-level[Set log level]:level:(trace debug info warn error)'
+        '-h[Show help]'
+        '--help[Show help]'
+        '-V[Show version]'
+        '--version[Show version]'
+    )
+
+    _arguments -C \
+        $global_opts \
+        '1:command:->command' \
+        '*::arg:->args'
+
+    case "$state" in
+        command)
+            _describe 'command' commands
+            ;;
+        args)
+            case "$words[1]" in
+                chat)
+                    _arguments \
+                        '-p[Output plain text without markdown]' \
+                        '--plain[Output plain text without markdown]' \
+                        '--context-file[Path to JSON context file]:file:_files -g "*.json"' \
+                        '*:message:'
+                    ;;
+                resume)
+                    _arguments \
+                        '-l[List all sessions]' \
+                        '--list[List all sessions]' \
+                        '*:session_id:'
+                    ;;
+                sentry-test)
+                    _arguments \
+                        '--panic[Trigger a test panic]'
+                    ;;
+                config|new|clear)
+                    # No additional arguments
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+_cherry2k "$@"
