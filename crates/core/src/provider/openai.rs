@@ -29,9 +29,8 @@
 //! let stream = provider.complete(request).await?;
 //! ```
 
-use std::future::Future;
-
 use async_stream::try_stream;
+use futures::future::BoxFuture;
 use futures::{Stream, StreamExt};
 use reqwest::Client;
 use reqwest_eventsource::{Event, EventSource, RequestBuilderExt};
@@ -82,14 +81,14 @@ impl AiProvider for OpenAiProvider {
     fn complete(
         &self,
         request: CompletionRequest,
-    ) -> impl Future<Output = Result<super::CompletionStream, ProviderError>> + Send {
+    ) -> BoxFuture<'_, Result<super::CompletionStream, ProviderError>> {
         // Clone what we need for the async block
         let client = self.client.clone();
         let api_key = self.config.api_key.clone().unwrap_or_default();
         let base_url = self.config.base_url.clone();
         let model = request.model.unwrap_or_else(|| self.config.model.clone());
 
-        async move {
+        Box::pin(async move {
             let url = format!("{}/chat/completions", base_url);
 
             let body = ChatCompletionRequest {
@@ -115,7 +114,7 @@ impl AiProvider for OpenAiProvider {
             // Return a stream that processes SSE events
             let stream = create_completion_stream(event_source);
             Ok(Box::pin(stream) as super::CompletionStream)
-        }
+        })
     }
 
     fn provider_id(&self) -> &'static str {
@@ -131,12 +130,12 @@ impl AiProvider for OpenAiProvider {
         }
     }
 
-    fn health_check(&self) -> impl Future<Output = Result<(), ProviderError>> + Send {
+    fn health_check(&self) -> BoxFuture<'_, Result<(), ProviderError>> {
         let client = self.client.clone();
         let base_url = self.config.base_url.clone();
         let api_key = self.config.api_key.clone().unwrap_or_default();
 
-        async move {
+        Box::pin(async move {
             // Make a lightweight request to verify connectivity and auth
             // Using /models endpoint as a health check
             let url = format!("{}/models", base_url);
@@ -176,7 +175,7 @@ impl AiProvider for OpenAiProvider {
                     "Unexpected status code: {status}"
                 ))),
             }
-        }
+        })
     }
 }
 

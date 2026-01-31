@@ -32,9 +32,8 @@
 //! let stream = provider.complete(request).await?;
 //! ```
 
-use std::future::Future;
-
 use async_stream::try_stream;
+use futures::future::BoxFuture;
 use futures::{Stream, StreamExt};
 use reqwest::Client;
 use serde::Serialize;
@@ -80,13 +79,13 @@ impl AiProvider for OllamaProvider {
     fn complete(
         &self,
         request: CompletionRequest,
-    ) -> impl Future<Output = Result<super::CompletionStream, ProviderError>> + Send {
+    ) -> BoxFuture<'_, Result<super::CompletionStream, ProviderError>> {
         // Clone what we need for the async block
         let client = self.client.clone();
         let host = self.config.host.clone();
         let model = request.model.unwrap_or_else(|| self.config.model.clone());
 
-        async move {
+        Box::pin(async move {
             let url = format!("{}/api/chat", host);
 
             let body = OllamaChatRequest {
@@ -135,7 +134,7 @@ impl AiProvider for OllamaProvider {
             // Return a stream that parses NDJSON
             let stream = parse_ollama_ndjson_stream(response);
             Ok(Box::pin(stream) as super::CompletionStream)
-        }
+        })
     }
 
     fn provider_id(&self) -> &'static str {
@@ -152,11 +151,11 @@ impl AiProvider for OllamaProvider {
         Ok(())
     }
 
-    fn health_check(&self) -> impl Future<Output = Result<(), ProviderError>> + Send {
+    fn health_check(&self) -> BoxFuture<'_, Result<(), ProviderError>> {
         let client = self.client.clone();
         let host = self.config.host.clone();
 
-        async move {
+        Box::pin(async move {
             // Use /api/version as a lightweight health check
             let url = format!("{}/api/version", host);
 
@@ -182,7 +181,7 @@ impl AiProvider for OllamaProvider {
                     reason: format!("Unexpected status: {}", response.status()),
                 })
             }
-        }
+        })
     }
 }
 

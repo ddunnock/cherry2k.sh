@@ -5,17 +5,18 @@
 //! - **Streaming-first**: All completions return a stream of chunks
 //! - **Provider-agnostic**: Works with OpenAI, Anthropic, Ollama, etc.
 //! - **Validation-explicit**: Constructors succeed, callers decide when to validate
+//! - **Dyn-compatible**: Can be used as `Box<dyn AiProvider>` for runtime dispatch
 //!
 //! # Design Decisions
 //!
 //! - **Single `complete()` method**: Returns a stream; non-streaming callers collect it
 //! - **Explicit `validate_config()`**: Separates construction from validation
 //! - **`health_check()` for reachability**: Async ping to confirm provider is available
-//! - **Native async**: Uses Rust 1.75+ async traits, no `async-trait` crate
+//! - **Boxed futures**: Uses `BoxFuture` for dyn-compatibility (runtime provider selection)
 
-use std::future::Future;
 use std::pin::Pin;
 
+use futures::future::BoxFuture;
 use futures::Stream;
 
 use super::types::CompletionRequest;
@@ -70,13 +71,11 @@ pub type CompletionStream = Pin<Box<dyn Stream<Item = Result<String, ProviderErr
 /// }
 ///
 /// impl AiProvider for MyProvider {
-///     fn complete(&self, request: CompletionRequest)
-///         -> impl Future<Output = Result<CompletionStream, ProviderError>> + Send
-///     {
-///         async move {
+///     fn complete(&self, request: CompletionRequest) -> BoxFuture<'_, Result<CompletionStream, ProviderError>> {
+///         Box::pin(async move {
 ///             // Make streaming API request
 ///             // Return stream of chunks
-///         }
+///         })
 ///     }
 ///
 ///     fn provider_id(&self) -> &'static str {
@@ -90,13 +89,11 @@ pub type CompletionStream = Pin<Box<dyn Stream<Item = Result<String, ProviderErr
 ///         Ok(())
 ///     }
 ///
-///     fn health_check(&self)
-///         -> impl Future<Output = Result<(), ProviderError>> + Send
-///     {
-///         async move {
+///     fn health_check(&self) -> BoxFuture<'_, Result<(), ProviderError>> {
+///         Box::pin(async move {
 ///             // Ping API to check connectivity
 ///             Ok(())
-///         }
+///         })
 ///     }
 /// }
 /// ```
@@ -125,7 +122,7 @@ pub trait AiProvider: Send + Sync {
     fn complete(
         &self,
         request: CompletionRequest,
-    ) -> impl Future<Output = Result<CompletionStream, ProviderError>> + Send;
+    ) -> BoxFuture<'_, Result<CompletionStream, ProviderError>>;
 
     /// Returns the unique identifier for this provider.
     ///
@@ -172,7 +169,7 @@ pub trait AiProvider: Send + Sync {
     /// - [`ProviderError::InvalidApiKey`]: Authentication failed
     /// - [`ProviderError::Unavailable`]: Provider is down
     /// - [`ProviderError::RequestFailed`]: Network error
-    fn health_check(&self) -> impl Future<Output = Result<(), ProviderError>> + Send;
+    fn health_check(&self) -> BoxFuture<'_, Result<(), ProviderError>>;
 }
 
 #[cfg(test)]
@@ -192,12 +189,14 @@ mod tests {
     struct MockProvider;
 
     impl AiProvider for MockProvider {
-        async fn complete(
+        fn complete(
             &self,
             _request: CompletionRequest,
-        ) -> Result<CompletionStream, ProviderError> {
-            let stream = futures::stream::empty();
-            Ok(Box::pin(stream) as CompletionStream)
+        ) -> futures::future::BoxFuture<'_, Result<CompletionStream, ProviderError>> {
+            Box::pin(async move {
+                let stream = futures::stream::empty();
+                Ok(Box::pin(stream) as CompletionStream)
+            })
         }
 
         fn provider_id(&self) -> &'static str {
@@ -208,8 +207,8 @@ mod tests {
             Ok(())
         }
 
-        async fn health_check(&self) -> Result<(), ProviderError> {
-            Ok(())
+        fn health_check(&self) -> futures::future::BoxFuture<'_, Result<(), ProviderError>> {
+            Box::pin(async move { Ok(()) })
         }
     }
 

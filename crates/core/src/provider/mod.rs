@@ -49,6 +49,7 @@
 //! ```
 
 mod anthropic;
+mod factory;
 mod ollama;
 mod openai;
 pub mod sse;
@@ -56,6 +57,7 @@ mod r#trait;
 mod types;
 
 pub use anthropic::AnthropicProvider;
+pub use factory::ProviderFactory;
 pub use ollama::OllamaProvider;
 pub use openai::OpenAiProvider;
 pub use r#trait::{AiProvider, CompletionStream};
