@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Seamless AI assistance without context switching - you stay in your terminal, in your flow.
-**Current focus:** Phase 5 - Multi-Provider Support (IN PROGRESS)
+**Current focus:** Phase 5 - Multi-Provider Support (COMPLETE)
 
 ## Current Position
 
 Phase: 5 of 7 (Multi-Provider Support)
-Plan: 3 of 4 in current phase
-Status: In progress (Wave 2 complete)
-Last activity: 2026-01-31 - Completed 05-03-PLAN.md (Provider Factory)
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-01-31 - Completed 05-04-PLAN.md (CLI Integration + Slash Commands)
 
-Progress: [##################---] 88%
+Progress: [####################-] 94%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
-- Average duration: 3.5 min
-- Total execution time: 53 min
+- Total plans completed: 16
+- Average duration: 3.6 min
+- Total execution time: 58 min
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [##################---] 88%
 | 02-single-provider-e2e | 3 | 12 min | 4.0 min |
 | 03-storage-and-session-continuity | 3 | 14 min | 4.7 min |
 | 04-zsh-integration | 3 | 11 min | 3.7 min |
-| 05-multi-provider-support | 3 | 9 min | 3.0 min |
+| 05-multi-provider-support | 4 | 14 min | 3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-03 (3 min), 05-01 (3 min), 05-02 (3 min), 05-03 (3 min)
-- Trend: Steady at ~3 min for provider implementations
+- Last 5 plans: 05-01 (3 min), 05-02 (3 min), 05-03 (3 min), 05-04 (5 min)
+- Trend: Steady execution, Phase 05 complete
 
 *Updated after each plan completion*
 
@@ -99,6 +99,8 @@ Recent decisions affecting current work:
 - [05-03]: BoxFuture for dyn-compatible async traits (enables Box<dyn AiProvider>)
 - [05-03]: Sorted fallback for default provider (determinism when configured default unavailable)
 - [05-03]: Per-provider validation with warning logs for invalid configs
+- [05-04]: State file for in-session provider switching (~/.local/state/cherry2k/active_provider)
+- [05-04]: prepare_context accepts &dyn AiProvider for ProviderFactory compatibility
 
 ### Pending Todos
 
@@ -111,7 +113,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-31T21:56:30Z
-Stopped at: Completed 05-03-PLAN.md (Provider Factory)
+Last session: 2026-01-31T22:07:11Z
+Stopped at: Completed 05-04-PLAN.md (CLI Integration + Slash Commands)
 Resume file: None
-Next: 05-04-PLAN.md (CLI Integration + Slash Commands - Wave 3)
+Next: Phase 06 - Intent Detection & Command Generation
