@@ -16,7 +16,7 @@ use cherry2k_core::provider::{AiProvider, CompletionRequest, Message, Role};
 
 use crate::Database;
 use crate::StorageError;
-use crate::message::{StoredMessage, delete_messages_before, get_messages, save_summary};
+use crate::message::{StoredMessage, get_messages};
 
 /// Maximum tokens for conversation history.
 const TOKEN_BUDGET: usize = 16_000;
@@ -65,6 +65,7 @@ pub struct ContextResult {
 /// # Returns
 ///
 /// Estimated token count.
+#[must_use]
 pub fn estimate_tokens(messages: &[StoredMessage]) -> usize {
     let total_chars: usize = messages.iter().map(|m| m.content.len()).sum();
     total_chars / CHARS_PER_TOKEN
@@ -182,12 +183,31 @@ pub async fn prepare_context<P: AiProvider>(
         }
     }
 
-    // Delete old messages from DB
-    let deleted = delete_messages_before(db, session_id, first_kept_id).await?;
-    tracing::debug!("Deleted {} old messages after summarization", deleted);
+    // Atomically delete old messages and save summary in a single transaction
+    // This prevents data loss if save_summary fails after deletion
+    let session_id_owned = session_id.to_string();
+    let summary_clone = summary.clone();
+    db.call(move |conn| {
+        let tx = conn.transaction()?;
 
-    // Save summary as system message
-    save_summary(db, session_id, &summary).await?;
+        // Delete old messages
+        let deleted = tx.execute(
+            "DELETE FROM messages WHERE session_id = ?1 AND id < ?2",
+            rusqlite::params![session_id_owned, first_kept_id],
+        )?;
+        tracing::debug!("Deleted {} old messages during summarization", deleted);
+
+        // Save summary as system message
+        tx.execute(
+            "INSERT INTO messages (session_id, role, content, is_summary) VALUES (?1, 'system', ?2, 1)",
+            rusqlite::params![session_id_owned, summary_clone],
+        )?;
+
+        tx.commit()?;
+        Ok(())
+    })
+    .await
+    .map_err(|e| StorageError::Database(format!("Failed to save summary: {e}")))?;
 
     // Build final message list: summary + recent messages
     let mut result_messages = Vec::with_capacity(recent_messages.len() + 1);

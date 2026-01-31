@@ -5,11 +5,14 @@ use chrono::{DateTime, Utc};
 /// Parses a SQLite datetime string into a DateTime<Utc>.
 ///
 /// SQLite stores datetimes as "YYYY-MM-DD HH:MM:SS" strings.
-/// Returns the current time if parsing fails.
+/// Returns the current time and logs a warning if parsing fails.
 pub fn parse_datetime(s: &str) -> DateTime<Utc> {
     chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S")
         .map(|dt| dt.and_utc())
-        .unwrap_or_else(|_| Utc::now())
+        .unwrap_or_else(|e| {
+            tracing::warn!("Invalid datetime in database '{}': {}", s, e);
+            Utc::now()
+        })
 }
 
 #[cfg(test)]

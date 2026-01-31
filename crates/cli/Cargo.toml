@@ -25,6 +25,7 @@ dotenvy.workspace = true
 indicatif.workspace = true
 termimad.workspace = true
 colored.workspace = true
+rand.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true

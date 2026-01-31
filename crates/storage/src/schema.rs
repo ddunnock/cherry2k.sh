@@ -51,6 +51,10 @@ CREATE INDEX IF NOT EXISTS idx_sessions_dir_time
 CREATE INDEX IF NOT EXISTS idx_messages_session
     ON messages(session_id, created_at ASC);
 
+-- Partial index for summary messages (used in context management)
+CREATE INDEX IF NOT EXISTS idx_messages_summary
+    ON messages(session_id, id DESC) WHERE is_summary = 1;
+
 -- Record schema version
 INSERT OR IGNORE INTO schema_version (version) VALUES (1);
 "#;

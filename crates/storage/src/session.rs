@@ -40,9 +40,10 @@ pub struct SessionInfo {
     pub first_message_preview: Option<String>,
 }
 
-/// Generates a timestamp-based session ID.
+/// Generates a timestamp-based session ID with random suffix.
 ///
-/// Format: "YYYY-MM-DD-HHMM-SSS" where SSS is milliseconds for uniqueness.
+/// Format: "YYYY-MM-DD-HHMM-SSS-XXXX" where SSS is milliseconds and XXXX is
+/// a random hex suffix for collision avoidance.
 ///
 /// # Example
 ///
@@ -50,15 +51,39 @@ pub struct SessionInfo {
 /// use cherry2k_storage::session::generate_session_id;
 ///
 /// let id = generate_session_id();
-/// // e.g., "2026-01-30-1423-456"
+/// // e.g., "2026-01-30-1423-456-a3f2"
 /// ```
+#[must_use]
 pub fn generate_session_id() -> String {
     let now = Utc::now();
+    let random_suffix: u16 = rand::random();
     format!(
-        "{}-{:03}",
+        "{}-{:03}-{:04x}",
         now.format("%Y-%m-%d-%H%M"),
-        now.timestamp_subsec_millis()
+        now.timestamp_subsec_millis(),
+        random_suffix
     )
+}
+
+/// Validates a session ID format.
+///
+/// Session IDs should match the format "YYYY-MM-DD-HHMM-SSS-XXXX" (24 chars)
+/// where SSS is milliseconds and XXXX is a hex random suffix.
+///
+/// Also accepts the legacy format "YYYY-MM-DD-HHMM-SSS" (19 chars) for
+/// backwards compatibility.
+#[must_use]
+pub fn is_valid_session_id(id: &str) -> bool {
+    // New format: 24 chars (YYYY-MM-DD-HHMM-SSS-XXXX)
+    // Legacy format: 19 chars (YYYY-MM-DD-HHMM-SSS)
+    let len = id.len();
+    if len != 24 && len != 19 {
+        return false;
+    }
+
+    // All chars must be digits or hyphens (and hex for new format)
+    id.chars()
+        .all(|c| c.is_ascii_digit() || c == '-' || c.is_ascii_hexdigit())
 }
 
 /// Creates a new session for the given working directory.
@@ -367,13 +392,13 @@ mod tests {
         #[test]
         fn generates_valid_format() {
             let id = generate_session_id();
-            // Format: YYYY-MM-DD-HHMM-SSS
-            assert_eq!(id.len(), 19, "ID should be 19 characters: {id}");
+            // Format: YYYY-MM-DD-HHMM-SSS-XXXX (24 chars)
+            assert_eq!(id.len(), 24, "ID should be 24 characters: {id}");
             assert!(id.contains('-'), "ID should contain dashes");
 
             // Parse parts
             let parts: Vec<&str> = id.split('-').collect();
-            assert_eq!(parts.len(), 5, "Should have 5 parts separated by dashes");
+            assert_eq!(parts.len(), 6, "Should have 6 parts separated by dashes");
 
             // Year
             let year: i32 = parts[0].parse().unwrap();
@@ -394,22 +419,59 @@ mod tests {
             // Milliseconds (000-999)
             let ms: u32 = parts[4].parse().unwrap();
             assert!(ms <= 999, "Milliseconds should be 0-999");
+
+            // Random hex suffix (4 hex digits)
+            assert_eq!(parts[5].len(), 4, "Hex suffix should be 4 characters");
+            assert!(
+                parts[5].chars().all(|c| c.is_ascii_hexdigit()),
+                "Suffix should be hex digits"
+            );
         }
 
         #[test]
         fn generates_unique_ids() {
-            // IDs generated with enough delay should be unique
+            // IDs should always be unique due to random suffix
             let id1 = generate_session_id();
-            std::thread::sleep(std::time::Duration::from_millis(2));
             let id2 = generate_session_id();
 
-            // At minimum, they should have different milliseconds or minute
-            // (unless we're extremely unlucky with timing at minute boundary)
-            // The format includes milliseconds, so 2ms delay should make them different
-            assert!(
-                id1 != id2 || id1.split('-').last() != id2.split('-').last(),
-                "IDs should differ or have different milliseconds"
-            );
+            // Random suffix makes collisions extremely unlikely
+            assert_ne!(id1, id2, "IDs should differ due to random suffix");
+        }
+    }
+
+    mod validate_session_id {
+        use super::*;
+
+        #[test]
+        fn accepts_new_format() {
+            assert!(is_valid_session_id("2026-01-30-1423-456-a3f2"));
+        }
+
+        #[test]
+        fn accepts_legacy_format() {
+            assert!(is_valid_session_id("2026-01-30-1423-456"));
+        }
+
+        #[test]
+        fn rejects_too_short() {
+            assert!(!is_valid_session_id("2026-01-30"));
+        }
+
+        #[test]
+        fn rejects_too_long() {
+            assert!(!is_valid_session_id("2026-01-30-1423-456-a3f2-extra"));
+        }
+
+        #[test]
+        fn rejects_invalid_chars() {
+            assert!(!is_valid_session_id("2026-01-30-1423-45x"));
+            assert!(!is_valid_session_id("hello-world-test-1234"));
+        }
+
+        #[test]
+        fn validates_generated_ids() {
+            let id = generate_session_id();
+            assert!(is_valid_session_id(&id), "Generated ID should be valid: {id}");
         }
     }
 
@@ -424,7 +486,8 @@ mod tests {
             let id = create_session(&db, working_dir).await.unwrap();
 
             assert!(!id.is_empty());
-            assert_eq!(id.len(), 19);
+            assert_eq!(id.len(), 24, "Session ID should be 24 characters: {id}");
+            assert!(is_valid_session_id(&id), "Session ID should be valid format");
         }
 
         #[tokio::test]

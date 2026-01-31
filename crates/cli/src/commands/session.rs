@@ -8,8 +8,8 @@
 use std::io::{self, Write};
 use std::path::Path;
 
-use anyhow::{Context, Result};
-use cherry2k_storage::session::{create_session, get_session, list_sessions};
+use anyhow::{Context, Result, bail};
+use cherry2k_storage::session::{create_session, get_session, list_sessions, is_valid_session_id};
 use cherry2k_storage::Database;
 
 /// Resume a session or list available sessions.
@@ -70,6 +70,11 @@ pub async fn resume(
     }
 
     if let Some(id) = session_id {
+        // Validate session ID format to prevent malformed input
+        if !is_valid_session_id(id) {
+            bail!("Invalid session ID format: {}", id);
+        }
+
         // Resume specific session
         let session = get_session(db, id).await.context("Failed to get session")?;
 
@@ -143,12 +148,12 @@ pub async fn clear(db: &Database) -> Result<()> {
         return Ok(());
     }
 
+    // Delete sessions - messages cascade automatically via foreign key
     let count = db
         .call(|conn| {
             let count: i64 =
                 conn.query_row("SELECT COUNT(*) FROM sessions", [], |row| row.get(0))?;
             if count > 0 {
-                conn.execute("DELETE FROM messages", [])?;
                 conn.execute("DELETE FROM sessions", [])?;
             }
             Ok(count)

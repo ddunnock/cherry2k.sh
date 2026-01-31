@@ -9,7 +9,6 @@
 //! exchange.
 
 use std::io::{self, Write};
-use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result};
 use cherry2k_core::config::Config;
@@ -154,8 +153,8 @@ pub async fn run(config: &Config, message: &str, _plain: bool) -> Result<()> {
         .context("Failed to save response")?;
 
     // Probabilistic cleanup (~10% of the time)
-    if let Ok(duration) = SystemTime::now().duration_since(UNIX_EPOCH)
-        && duration.as_millis() % 10 == 0
+    // Using random to avoid timing-based patterns
+    if rand::random::<u8>() < 26  // ~10% chance (26/256 ≈ 10.2%)
         && let Ok(count) = cleanup_old_sessions(&db).await
         && count > 0
     {

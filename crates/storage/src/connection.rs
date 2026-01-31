@@ -70,9 +70,9 @@ impl Database {
     ///
     /// Returns `StorageError` if the database cannot be opened or initialized.
     pub async fn open_at(path: PathBuf) -> Result<Self, StorageError> {
-        // Ensure parent directory exists
+        // Ensure parent directory exists (using async fs to avoid blocking)
         if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent).map_err(|e| {
+            tokio::fs::create_dir_all(parent).await.map_err(|e| {
                 StorageError::IoError(format!("Failed to create database directory: {e}"))
             })?;
         }

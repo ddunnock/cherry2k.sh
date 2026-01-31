@@ -3,7 +3,7 @@
 //! This crate provides SQLite-based persistence for Cherry2K, including:
 //! - Conversation history storage
 //! - Session management
-//! - User preferences
+//! - Context window management with summarization
 //!
 //! # Usage
 //!
@@ -47,7 +47,7 @@ pub use connection::Database;
 pub use context::{ContextResult, prepare_context};
 
 // Re-export session types
-pub use session::{Session, SessionInfo};
+pub use session::{Session, SessionInfo, is_valid_session_id};
 
 // Re-export message types
 pub use message::StoredMessage;
