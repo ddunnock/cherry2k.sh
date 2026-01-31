@@ -32,10 +32,14 @@ fn get_state_dir() -> Option<PathBuf> {
 pub fn get_active_provider() -> Option<String> {
     let state_dir = get_state_dir()?;
     let path = state_dir.join("active_provider");
-    fs::read_to_string(&path)
-        .ok()
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
+    match fs::read_to_string(&path) {
+        Ok(s) => Some(s.trim().to_string()).filter(|s| !s.is_empty()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+        Err(e) => {
+            tracing::debug!("Failed to read active_provider state: {e}");
+            None
+        }
+    }
 }
 
 /// Set the active provider in state file.
@@ -52,6 +56,22 @@ fn set_active_provider(name: &str) -> Result<()> {
 // ============================================================================
 // Helper Functions
 // ============================================================================
+
+/// Initialize provider factory and determine active provider.
+///
+/// Returns the factory and the name of the currently active provider
+/// (either from state file or config default).
+fn get_factory_and_active(config: &Config) -> Result<(ProviderFactory, String)> {
+    let factory = ProviderFactory::from_config(config)
+        .map_err(|e| anyhow::anyhow!("{}", e))
+        .context("Failed to initialize providers")?;
+
+    let active_name = get_active_provider()
+        .filter(|name| factory.contains(name))
+        .unwrap_or_else(|| factory.default_provider_name().to_string());
+
+    Ok((factory, active_name))
+}
 
 /// Get the model name for a provider from config.
 fn get_model_for_provider(config: &Config, provider: &str) -> String {
@@ -80,14 +100,7 @@ fn get_model_for_provider(config: &Config, provider: &str) -> String {
 ///     openai (gpt-4o)
 /// ```
 pub fn run_list(config: &Config) -> Result<()> {
-    let factory = ProviderFactory::from_config(config)
-        .map_err(|e| anyhow::anyhow!("{}", e))
-        .context("Failed to initialize providers")?;
-
-    // Determine which provider is currently active
-    let active_name = get_active_provider()
-        .filter(|name| factory.contains(name))
-        .unwrap_or_else(|| factory.default_provider_name().to_string());
+    let (factory, active_name) = get_factory_and_active(config)?;
 
     println!("Available providers:");
     for name in factory.list() {
@@ -104,14 +117,7 @@ pub fn run_list(config: &Config) -> Result<()> {
 ///
 /// Format: `Currently using: anthropic (claude-sonnet-4-20250514)`
 pub fn run_current(config: &Config) -> Result<()> {
-    let factory = ProviderFactory::from_config(config)
-        .map_err(|e| anyhow::anyhow!("{}", e))
-        .context("Failed to initialize providers")?;
-
-    // Determine which provider is currently active
-    let active_name = get_active_provider()
-        .filter(|name| factory.contains(name))
-        .unwrap_or_else(|| factory.default_provider_name().to_string());
+    let (_factory, active_name) = get_factory_and_active(config)?;
 
     let model = get_model_for_provider(config, &active_name);
     println!("Currently using: {} ({})", active_name, model);
@@ -124,9 +130,7 @@ pub fn run_current(config: &Config) -> Result<()> {
 /// Validates that the provider exists in the factory before switching.
 /// If the provider doesn't exist, shows an error and lists available providers.
 pub fn run_switch(config: &Config, provider_name: &str) -> Result<()> {
-    let factory = ProviderFactory::from_config(config)
-        .map_err(|e| anyhow::anyhow!("{}", e))
-        .context("Failed to initialize providers")?;
+    let (factory, _) = get_factory_and_active(config)?;
 
     // Validate provider exists
     if !factory.contains(provider_name) {

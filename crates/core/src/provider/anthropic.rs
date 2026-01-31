@@ -51,6 +51,21 @@ const ANTHROPIC_API_BASE: &str = "https://api.anthropic.com/v1";
 /// Anthropic requires explicit max_tokens in requests.
 const DEFAULT_MAX_TOKENS: u32 = 4096;
 
+/// Default retry-after seconds when header is missing or unparseable.
+const DEFAULT_RETRY_AFTER_SECS: u64 = 60;
+
+/// Parse the Retry-After header from a response.
+///
+/// Returns the number of seconds to wait, or the default if the header
+/// is missing or cannot be parsed.
+fn parse_retry_after(headers: &reqwest::header::HeaderMap) -> u64 {
+    headers
+        .get("Retry-After")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(DEFAULT_RETRY_AFTER_SECS)
+}
+
 /// Anthropic Claude API provider.
 ///
 /// Implements streaming completions using Anthropic's messages API.
@@ -177,12 +192,7 @@ impl AiProvider for AnthropicProvider {
                     provider: "anthropic".to_string(),
                 }),
                 429 => {
-                    let retry_after = response
-                        .headers()
-                        .get("Retry-After")
-                        .and_then(|v| v.to_str().ok())
-                        .and_then(|s| s.parse().ok())
-                        .unwrap_or(60);
+                    let retry_after = parse_retry_after(response.headers());
                     Err(ProviderError::RateLimited {
                         provider: "anthropic".to_string(),
                         retry_after_secs: retry_after,
@@ -312,6 +322,8 @@ fn create_anthropic_stream(
                 Some(Err(reqwest_eventsource::Error::InvalidStatusCode(status, response))) => {
                     // Handle HTTP error status codes
                     let status_code = status.as_u16();
+                    // Extract headers before consuming body
+                    let retry_after = parse_retry_after(response.headers());
                     let body = response.text().await.unwrap_or_default();
 
                     match status_code {
@@ -323,7 +335,7 @@ fn create_anthropic_stream(
                         429 => {
                             Err(ProviderError::RateLimited {
                                 provider: "anthropic".to_string(),
-                                retry_after_secs: 60,
+                                retry_after_secs: retry_after,
                             })?;
                         }
                         500..=599 => {

@@ -86,6 +86,13 @@ pub enum ConfigError {
         /// Why the value is invalid
         reason: String,
     },
+
+    /// No providers are configured or available
+    #[error("No providers available: {message}")]
+    NoProviderAvailable {
+        /// Help message for how to configure providers
+        message: String,
+    },
 }
 
 /// Errors from storage operations

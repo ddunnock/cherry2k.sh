@@ -102,8 +102,8 @@ impl ProviderFactory {
 
         // Validate we have at least one provider
         if providers.is_empty() {
-            return Err(ConfigError::MissingField {
-                field: "No providers configured. Set OPENAI_API_KEY, ANTHROPIC_API_KEY, or configure Ollama.".to_string(),
+            return Err(ConfigError::NoProviderAvailable {
+                message: "Set OPENAI_API_KEY, ANTHROPIC_API_KEY, or configure Ollama.".to_string(),
             });
         }
 
@@ -111,9 +111,13 @@ impl ProviderFactory {
         let default_provider = config.general.default_provider.clone();
         if !providers.contains_key(&default_provider) {
             // Pick first available provider as fallback (sorted for determinism)
+            // SAFETY: We just verified providers is not empty above
             let mut available: Vec<_> = providers.keys().cloned().collect();
             available.sort();
-            let fallback = available.into_iter().next().expect("providers not empty");
+            let fallback = available
+                .into_iter()
+                .next()
+                .unwrap_or_else(|| unreachable!("providers verified non-empty above"));
 
             tracing::warn!(
                 "Default provider '{}' not available, using '{}'",
@@ -161,10 +165,13 @@ impl ProviderFactory {
     /// ```
     #[must_use]
     pub fn get_default(&self) -> &dyn AiProvider {
-        // Safe: default_provider is guaranteed to exist after from_config succeeds
+        // SAFETY: default_provider is guaranteed to exist after from_config succeeds.
+        // The invariant is maintained by from_config which either:
+        // - Sets default_provider to config value (after validating it exists), or
+        // - Falls back to first available provider (after validating providers is non-empty)
         self.providers
             .get(&self.default_provider)
-            .expect("default provider must exist")
+            .unwrap_or_else(|| unreachable!("default_provider invariant violated"))
             .as_ref()
     }
 
@@ -334,7 +341,7 @@ mod tests {
             let config = fixtures::config_no_providers();
             let result = ProviderFactory::from_config(&config);
 
-            assert!(matches!(result, Err(ConfigError::MissingField { .. })));
+            assert!(matches!(result, Err(ConfigError::NoProviderAvailable { .. })));
         }
 
         #[test]
