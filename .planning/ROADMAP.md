@@ -81,12 +81,12 @@ Plans:
   3. User returns to normal prompt after response completes
   4. Ctrl+G keybinding triggers AI mode from anywhere in command line
   5. Tab completion works for cherry2k commands
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: ZLE widget for `* ` prefix capture
-- [ ] 04-02: Shell functions and plugin file
-- [ ] 04-03: Keybindings and completions
+- [ ] 04-01-PLAN.md - ZLE widget for `* ` prefix detection and AI mode state
+- [ ] 04-02-PLAN.md - Shell context collection and AI invocation flow
+- [ ] 04-03-PLAN.md - Ctrl+G keybinding, vim navigation, and tab completions
 
 ### Phase 5: Multi-Provider Support
 **Goal**: Support OpenAI, Anthropic, and Ollama with seamless switching
@@ -151,7 +151,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. Foundation and Safety | 3/3 | ✓ Complete | 2026-01-30 |
 | 2. Single Provider End-to-End | 3/3 | ✓ Complete | 2026-01-30 |
 | 3. Storage and Session Continuity | 3/3 | ✓ Complete | 2026-01-30 |
-| 4. Zsh Integration | 0/3 | Not started | - |
+| 4. Zsh Integration | 0/3 | Planned | - |
 | 5. Multi-Provider Support | 0/3 | Not started | - |
 | 6. Command Execution Flow | 0/3 | Not started | - |
 | 7. File Operations | 0/3 | Not started | - |
