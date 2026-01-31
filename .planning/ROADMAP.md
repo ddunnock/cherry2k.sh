@@ -98,12 +98,13 @@ Plans:
   3. User can switch providers via config file
   4. User can switch providers in-session with `* /provider anthropic`
   5. Streaming works consistently across all providers
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 05-01: Anthropic provider implementation
-- [ ] 05-02: Ollama provider implementation
-- [ ] 05-03: Provider factory and in-session switching
+- [ ] 05-01-PLAN.md - Anthropic provider implementation with SSE streaming
+- [ ] 05-02-PLAN.md - Ollama provider implementation with NDJSON streaming
+- [ ] 05-03-PLAN.md - Provider factory for registration and lookup
+- [ ] 05-04-PLAN.md - CLI integration and /provider slash commands
 
 ### Phase 6: Command Execution Flow
 **Goal**: Enable AI to suggest commands that execute in user's shell
@@ -152,7 +153,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Single Provider End-to-End | 3/3 | ✓ Complete | 2026-01-30 |
 | 3. Storage and Session Continuity | 3/3 | ✓ Complete | 2026-01-30 |
 | 4. Zsh Integration | 3/3 | ✓ Complete | 2026-01-31 |
-| 5. Multi-Provider Support | 0/3 | Not started | - |
+| 5. Multi-Provider Support | 0/4 | Not started | - |
 | 6. Command Execution Flow | 0/3 | Not started | - |
 | 7. File Operations | 0/3 | Not started | - |
 
