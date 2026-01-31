@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Seamless AI assistance without context switching - you stay in your terminal, in your flow.
-**Current focus:** Phase 4 - Zsh Integration (in progress)
+**Current focus:** Phase 4 - Zsh Integration (COMPLETE)
 
 ## Current Position
 
 Phase: 4 of 7 (Zsh Integration)
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2026-01-31 - Completed 04-02-PLAN.md (AI Invocation and Response Streaming)
+Plan: 3 of 3 in current phase
+Status: Phase complete
+Last activity: 2026-01-31 - Completed 04-03-PLAN.md (Keybindings and Completions)
 
-Progress: [##############-------] 69%
+Progress: [################-----] 75%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: 3.5 min
-- Total execution time: 41 min
+- Total execution time: 44 min
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [##############-------] 69%
 | 01-foundation | 3 | 7 min | 2.3 min |
 | 02-single-provider-e2e | 3 | 12 min | 4.0 min |
 | 03-storage-and-session-continuity | 3 | 14 min | 4.7 min |
-| 04-zsh-integration | 2 | 8 min | 4.0 min |
+| 04-zsh-integration | 3 | 11 min | 3.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (4 min), 03-03 (5 min), 04-01 (3 min), 04-02 (5 min)
+- Last 5 plans: 03-03 (5 min), 04-01 (3 min), 04-02 (5 min), 04-03 (3 min)
 - Trend: Steady at ~3-5 min for moderate complexity plans
 
 *Updated after each plan completion*
@@ -86,6 +86,9 @@ Recent decisions affecting current work:
 - [04-02]: History prevention via BUFFER="" before accept-line
 - [04-02]: ANSI escape codes in StreamWriter for retro green color
 - [04-02]: Drop impl on StreamWriter for color reset on interruption
+- [04-03]: Ctrl+G handler in separate keybindings.zsh for organization
+- [04-03]: Vim escape widget stays in AI mode when switching to command mode
+- [04-03]: fpath setup before compinit for proper completion discovery
 
 ### Pending Todos
 
@@ -98,7 +101,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-31T18:47:05Z
-Stopped at: Completed 04-02-PLAN.md (AI Invocation and Response Streaming)
+Last session: 2026-01-31T18:52:55Z
+Stopped at: Completed 04-03-PLAN.md (Keybindings and Completions)
 Resume file: None
-Next: 04-03-PLAN.md (Keybindings and Completions)
+Next: Phase 05 - Multi-Provider Support
