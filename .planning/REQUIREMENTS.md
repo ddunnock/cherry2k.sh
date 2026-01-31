@@ -66,9 +66,9 @@
 | TERM-04 | Phase 3 | Complete |
 | TERM-01 | Phase 4 | Complete |
 | TERM-02 | Phase 4 | Complete |
-| PROV-02 | Phase 5 | Pending |
-| PROV-03 | Phase 5 | Pending |
-| PROV-04 | Phase 5 | Pending |
+| PROV-02 | Phase 5 | Complete |
+| PROV-03 | Phase 5 | Complete |
+| PROV-04 | Phase 5 | Complete |
 | INTENT-01 | Phase 6 | Pending |
 | INTENT-02 | Phase 6 | Pending |
 | INTENT-03 | Phase 6 | Pending |

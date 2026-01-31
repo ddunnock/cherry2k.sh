@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Single Provider End-to-End** - OpenAI streaming responses working via CLI
 - [x] **Phase 3: Storage and Session Continuity** - Conversation persistence and session resume
 - [x] **Phase 4: Zsh Integration** - The `* ` prefix inline experience
-- [ ] **Phase 5: Multi-Provider Support** - Anthropic, Ollama, and provider switching
+- [x] **Phase 5: Multi-Provider Support** - Anthropic, Ollama, and provider switching
 - [ ] **Phase 6: Command Execution Flow** - Intent detection and shell command execution
 - [ ] **Phase 7: File Operations** - File reading, writing, and editing with diff preview
 
@@ -101,10 +101,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 05-01-PLAN.md - Anthropic provider implementation with SSE streaming
-- [ ] 05-02-PLAN.md - Ollama provider implementation with NDJSON streaming
-- [ ] 05-03-PLAN.md - Provider factory for registration and lookup
-- [ ] 05-04-PLAN.md - CLI integration and /provider slash commands
+- [x] 05-01-PLAN.md - Anthropic provider implementation with SSE streaming
+- [x] 05-02-PLAN.md - Ollama provider implementation with NDJSON streaming
+- [x] 05-03-PLAN.md - Provider factory for registration and lookup
+- [x] 05-04-PLAN.md - CLI integration and /provider slash commands
 
 ### Phase 6: Command Execution Flow
 **Goal**: Enable AI to suggest commands that execute in user's shell
@@ -153,7 +153,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Single Provider End-to-End | 3/3 | ✓ Complete | 2026-01-30 |
 | 3. Storage and Session Continuity | 3/3 | ✓ Complete | 2026-01-30 |
 | 4. Zsh Integration | 3/3 | ✓ Complete | 2026-01-31 |
-| 5. Multi-Provider Support | 0/4 | Not started | - |
+| 5. Multi-Provider Support | 4/4 | ✓ Complete | 2026-01-31 |
 | 6. Command Execution Flow | 0/3 | Not started | - |
 | 7. File Operations | 0/3 | Not started | - |
 
