@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Seamless AI assistance without context switching - you stay in your terminal, in your flow.
-**Current focus:** Phase 4 - Zsh Integration (COMPLETE)
+**Current focus:** Phase 5 - Multi-Provider Support (IN PROGRESS)
 
 ## Current Position
 
-Phase: 4 of 7 (Zsh Integration)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-01-31 - Completed 04-03-PLAN.md (Keybindings and Completions)
+Phase: 5 of 7 (Multi-Provider Support)
+Plan: 1 of 4 in current phase
+Status: In progress (Wave 1)
+Last activity: 2026-01-31 - Completed 05-01-PLAN.md (Anthropic Provider)
 
-Progress: [################-----] 75%
+Progress: [#################----] 81%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 3.5 min
-- Total execution time: 44 min
+- Total plans completed: 13
+- Average duration: 3.4 min
+- Total execution time: 47 min
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [################-----] 75%
 | 02-single-provider-e2e | 3 | 12 min | 4.0 min |
 | 03-storage-and-session-continuity | 3 | 14 min | 4.7 min |
 | 04-zsh-integration | 3 | 11 min | 3.7 min |
+| 05-multi-provider-support | 1 | 3 min | 3.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-03 (5 min), 04-01 (3 min), 04-02 (5 min), 04-03 (3 min)
+- Last 5 plans: 04-01 (3 min), 04-02 (5 min), 04-03 (3 min), 05-01 (3 min)
 - Trend: Steady at ~3-5 min for moderate complexity plans
 
 *Updated after each plan completion*
@@ -89,6 +90,9 @@ Recent decisions affecting current work:
 - [04-03]: Ctrl+G handler in separate keybindings.zsh for organization
 - [04-03]: Vim escape widget stays in AI mode when switching to command mode
 - [04-03]: fpath setup before compinit for proper completion discovery
+- [05-01]: System messages extracted to Anthropic's separate system parameter
+- [05-01]: Multiple system messages concatenated with double newline
+- [05-01]: Default max_tokens set to 4096 (Anthropic requires explicit value)
 
 ### Pending Todos
 
@@ -101,7 +105,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-31T18:52:55Z
-Stopped at: Completed 04-03-PLAN.md (Keybindings and Completions)
+Last session: 2026-01-31T21:50:04Z
+Stopped at: Completed 05-01-PLAN.md (Anthropic Provider)
 Resume file: None
-Next: Phase 05 - Multi-Provider Support
+Next: 05-02 (Ollama Provider - Wave 1 parallel), then 05-03 (Provider Factory - Wave 2)
