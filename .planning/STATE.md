@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Seamless AI assistance without context switching - you stay in your terminal, in your flow.
-**Current focus:** Phase 3 - Storage and Session Continuity (complete)
+**Current focus:** Phase 4 - Zsh Integration (in progress)
 
 ## Current Position
 
-Phase: 3 of 7 (Storage and Session Continuity)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-01-30 - Completed 03-03-PLAN.md (Session Integration and Context Management)
+Phase: 4 of 7 (Zsh Integration)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-01-31 - Completed 04-01-PLAN.md (AI Mode Widget Infrastructure)
 
-Progress: [############---------] 57%
+Progress: [#############--------] 63%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 3.4 min
-- Total execution time: 33 min
+- Total plans completed: 10
+- Average duration: 3.3 min
+- Total execution time: 36 min
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [############---------] 57%
 | 01-foundation | 3 | 7 min | 2.3 min |
 | 02-single-provider-e2e | 3 | 12 min | 4.0 min |
 | 03-storage-and-session-continuity | 3 | 14 min | 4.7 min |
+| 04-zsh-integration | 1 | 3 min | 3.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (5 min), 03-01 (5 min), 03-02 (4 min), 03-03 (5 min)
-- Trend: Steady at ~4-5 min for moderate complexity plans
+- Last 5 plans: 03-01 (5 min), 03-02 (4 min), 03-03 (5 min), 04-01 (3 min)
+- Trend: Steady at ~3-5 min for moderate complexity plans
 
 *Updated after each plan completion*
 
@@ -77,6 +78,9 @@ Recent decisions affecting current work:
 - [03-03]: 4 chars/token heuristic for token estimation
 - [03-03]: Response accumulation preserves streaming output
 - [03-03]: Probabilistic cleanup (~10%) to avoid per-chat performance impact
+- [04-01]: Use .self-insert for builtin widget reference (dot prefix avoids recursion)
+- [04-01]: Separate backward-delete-char wrapper for exit detection
+- [04-01]: Unicode escape $'\U1F352' for cherry emoji in prompt
 
 ### Pending Todos
 
@@ -88,7 +92,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-30T23:41:00Z
-Stopped at: Completed 03-03-PLAN.md (Session Integration and Context Management)
+Last session: 2026-01-31T18:38:00Z
+Stopped at: Completed 04-01-PLAN.md (AI Mode Widget Infrastructure)
 Resume file: None
-Next: Phase 04 - Anthropic Provider
+Next: 04-02-PLAN.md (AI Invocation and Response Streaming)
