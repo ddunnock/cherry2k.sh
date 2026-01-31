@@ -16,10 +16,10 @@ use cherry2k_core::provider::Role;
 use cherry2k_core::{AiProvider, CompletionRequest, Message, OpenAiProvider};
 use cherry2k_storage::message::save_message;
 use cherry2k_storage::session::{cleanup_old_sessions, get_or_create_session};
-use cherry2k_storage::{prepare_context, Database};
+use cherry2k_storage::{Database, prepare_context};
 use tokio_stream::StreamExt;
 
-use crate::output::{display_provider_error, ResponseSpinner, StreamWriter};
+use crate::output::{ResponseSpinner, StreamWriter, display_provider_error};
 use crate::signal::setup_cancellation;
 
 /// Run the chat command.

@@ -9,8 +9,8 @@ use std::io::{self, Write};
 use std::path::Path;
 
 use anyhow::{Context, Result, bail};
-use cherry2k_storage::session::{create_session, get_session, list_sessions, is_valid_session_id};
 use cherry2k_storage::Database;
+use cherry2k_storage::session::{create_session, get_session, is_valid_session_id, list_sessions};
 
 /// Resume a session or list available sessions.
 ///

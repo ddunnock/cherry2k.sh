@@ -471,7 +471,10 @@ mod tests {
         #[test]
         fn validates_generated_ids() {
             let id = generate_session_id();
-            assert!(is_valid_session_id(&id), "Generated ID should be valid: {id}");
+            assert!(
+                is_valid_session_id(&id),
+                "Generated ID should be valid: {id}"
+            );
         }
     }
 
@@ -487,7 +490,10 @@ mod tests {
 
             assert!(!id.is_empty());
             assert_eq!(id.len(), 24, "Session ID should be 24 characters: {id}");
-            assert!(is_valid_session_id(&id), "Session ID should be valid format");
+            assert!(
+                is_valid_session_id(&id),
+                "Session ID should be valid format"
+            );
         }
 
         #[tokio::test]

@@ -177,6 +177,7 @@ confirm_commands = false
 "#
         )
         .unwrap();
+        file.flush().unwrap();
 
         // SAFETY: Test environment, single-threaded test execution
         unsafe {
@@ -196,6 +197,7 @@ confirm_commands = false
     fn test_invalid_toml_returns_error() {
         let mut file = NamedTempFile::new().unwrap();
         writeln!(file, "this is not valid toml {{{{").unwrap();
+        file.flush().unwrap();
 
         // SAFETY: Test environment, single-threaded test execution
         unsafe {

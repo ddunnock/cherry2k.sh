@@ -192,14 +192,12 @@ mod tests {
     struct MockProvider;
 
     impl AiProvider for MockProvider {
-        fn complete(
+        async fn complete(
             &self,
             _request: CompletionRequest,
-        ) -> impl Future<Output = Result<CompletionStream, ProviderError>> + Send {
-            async {
-                let stream = futures::stream::empty();
-                Ok(Box::pin(stream) as CompletionStream)
-            }
+        ) -> Result<CompletionStream, ProviderError> {
+            let stream = futures::stream::empty();
+            Ok(Box::pin(stream) as CompletionStream)
         }
 
         fn provider_id(&self) -> &'static str {
@@ -210,8 +208,8 @@ mod tests {
             Ok(())
         }
 
-        fn health_check(&self) -> impl Future<Output = Result<(), ProviderError>> + Send {
-            async { Ok(()) }
+        async fn health_check(&self) -> Result<(), ProviderError> {
+            Ok(())
         }
     }
 
