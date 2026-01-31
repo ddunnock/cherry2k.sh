@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 5 of 7 (Multi-Provider Support)
-Plan: 2 of 4 in current phase
-Status: In progress (Wave 1 complete)
-Last activity: 2026-01-31 - Completed 05-02-PLAN.md (Ollama Provider)
+Plan: 3 of 4 in current phase
+Status: In progress (Wave 2 complete)
+Last activity: 2026-01-31 - Completed 05-03-PLAN.md (Provider Factory)
 
-Progress: [#################----] 82%
+Progress: [##################---] 88%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
-- Average duration: 3.4 min
-- Total execution time: 50 min
+- Total plans completed: 15
+- Average duration: 3.5 min
+- Total execution time: 53 min
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [#################----] 82%
 | 02-single-provider-e2e | 3 | 12 min | 4.0 min |
 | 03-storage-and-session-continuity | 3 | 14 min | 4.7 min |
 | 04-zsh-integration | 3 | 11 min | 3.7 min |
-| 05-multi-provider-support | 2 | 6 min | 3.0 min |
+| 05-multi-provider-support | 3 | 9 min | 3.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (5 min), 04-03 (3 min), 05-01 (3 min), 05-02 (3 min)
+- Last 5 plans: 04-03 (3 min), 05-01 (3 min), 05-02 (3 min), 05-03 (3 min)
 - Trend: Steady at ~3 min for provider implementations
 
 *Updated after each plan completion*
@@ -96,6 +96,9 @@ Recent decisions affecting current work:
 - [05-02]: NDJSON byte buffering for network chunk boundaries
 - [05-02]: health_check uses /api/version endpoint for Ollama
 - [05-02]: Helpful error messages for common Ollama issues
+- [05-03]: BoxFuture for dyn-compatible async traits (enables Box<dyn AiProvider>)
+- [05-03]: Sorted fallback for default provider (determinism when configured default unavailable)
+- [05-03]: Per-provider validation with warning logs for invalid configs
 
 ### Pending Todos
 
@@ -108,7 +111,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-01-31T21:50:53Z
-Stopped at: Completed 05-02-PLAN.md (Ollama Provider)
+Last session: 2026-01-31T21:56:30Z
+Stopped at: Completed 05-03-PLAN.md (Provider Factory)
 Resume file: None
-Next: 05-03-PLAN.md (Provider Factory - Wave 2)
+Next: 05-04-PLAN.md (CLI Integration + Slash Commands - Wave 3)
