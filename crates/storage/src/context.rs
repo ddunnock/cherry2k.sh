@@ -398,6 +398,7 @@ mod tests {
 
     mod prepare_context {
         use super::*;
+        use futures::future::BoxFuture;
 
         // Use a shared dummy provider definition for tests
         struct DummyProvider;
@@ -406,17 +407,15 @@ mod tests {
             fn complete(
                 &self,
                 _request: CompletionRequest,
-            ) -> impl std::future::Future<
-                Output = Result<
-                    cherry2k_core::provider::CompletionStream,
-                    cherry2k_core::ProviderError,
-                >,
-            > + Send {
-                async {
+            ) -> BoxFuture<
+                '_,
+                Result<cherry2k_core::provider::CompletionStream, cherry2k_core::ProviderError>,
+            > {
+                Box::pin(async {
                     Err(cherry2k_core::ProviderError::InvalidApiKey {
                         provider: "dummy".to_string(),
                     })
-                }
+                })
             }
 
             fn provider_id(&self) -> &'static str {
@@ -427,11 +426,8 @@ mod tests {
                 Ok(())
             }
 
-            fn health_check(
-                &self,
-            ) -> impl std::future::Future<Output = Result<(), cherry2k_core::ProviderError>> + Send
-            {
-                async { Ok(()) }
+            fn health_check(&self) -> BoxFuture<'_, Result<(), cherry2k_core::ProviderError>> {
+                Box::pin(async { Ok(()) })
             }
         }
 

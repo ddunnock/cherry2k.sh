@@ -42,6 +42,14 @@ enum Commands {
     },
     /// Show current configuration
     Config,
+    /// Show or switch AI providers
+    Provider {
+        /// Provider to switch to (omit to show current)
+        name: Option<String>,
+        /// List all available providers
+        #[arg(short, long)]
+        list: bool,
+    },
     /// Resume a previous session or list sessions
     Resume {
         /// List all sessions instead of resuming
@@ -111,6 +119,15 @@ async fn main() -> Result<()> {
         }
         Commands::Config => {
             commands::config::run(&config)?;
+        }
+        Commands::Provider { name, list } => {
+            if list {
+                commands::provider::run_list(&config)?;
+            } else if let Some(provider_name) = name {
+                commands::provider::run_switch(&config, &provider_name)?;
+            } else {
+                commands::provider::run_current(&config)?;
+            }
         }
         Commands::Resume { list, session_id } => {
             let db = Database::open()

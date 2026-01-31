@@ -116,6 +116,56 @@ _cherry2k_collect_context() {
 }
 
 # ============================================================================
+# Slash Command Handling
+# ============================================================================
+
+# Handle slash commands in AI mode
+# Returns 0 if a slash command was handled, 1 otherwise
+_cherry2k_handle_slash_command() {
+    local input="$1"
+
+    case "$input" in
+        /provider)
+            cherry2k provider
+            return 0
+            ;;
+        /provider\ *)
+            local provider_name="${input#/provider }"
+            cherry2k provider "$provider_name"
+            return 0
+            ;;
+        /providers)
+            cherry2k provider --list
+            return 0
+            ;;
+        /model)
+            # TODO: Phase 5 extension - model switching
+            echo "Model switching not yet implemented"
+            return 0
+            ;;
+        /model\ *)
+            echo "Model switching not yet implemented"
+            return 0
+            ;;
+        /models)
+            echo "Model listing not yet implemented"
+            return 0
+            ;;
+        /help)
+            echo "Available slash commands:"
+            echo "  /provider         - Show current provider"
+            echo "  /provider <name>  - Switch to provider"
+            echo "  /providers        - List all providers"
+            echo "  /help             - Show this help"
+            return 0
+            ;;
+        *)
+            return 1  # Not a slash command
+            ;;
+    esac
+}
+
+# ============================================================================
 # AI Mode Accept (Enter Handler)
 # ============================================================================
 
@@ -138,6 +188,14 @@ _cherry2k_ai_mode_accept() {
     zle .accept-line
     print ""
 
+    # Check for slash commands first
+    if _cherry2k_handle_slash_command "$query"; then
+        _cherry2k_exit_ai_mode
+        zle .reset-prompt 2>/dev/null || true
+        return 0
+    fi
+
+    # Not a slash command, proceed with AI request
     local context_file
     context_file=$(_cherry2k_collect_context)
     trap '_cherry2k_cleanup_on_sigint "$context_file"' INT
