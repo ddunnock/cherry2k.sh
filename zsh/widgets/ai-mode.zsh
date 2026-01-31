@@ -105,41 +105,11 @@ _cherry2k_backward_delete_wrapper() {
 }
 
 # ============================================================================
-# Ctrl+G Handler
+# Ctrl+G Handler (defined in keybindings.zsh, stub here for compatibility)
 # ============================================================================
 
-# Handle Ctrl+G to toggle AI mode
-_cherry2k_ctrl_g_handler() {
-    if [[ $_CHERRY2K_AI_MODE -eq 0 ]]; then
-        # Not in AI mode: enter AI mode
-        if [[ -z "$BUFFER" ]]; then
-            # Empty prompt: just enter AI mode with empty buffer
-            _CHERRY2K_AI_MODE=1
-            _CHERRY2K_SAVED_PROMPT="$PROMPT"
-            PROMPT=$'\U1F352 '
-            # Bind Enter to AI mode accept handler
-            bindkey '^M' _cherry2k_ai_mode_accept
-            zle -R
-        else
-            # Non-empty: prepend "* " and enter AI mode
-            local current_buffer="$BUFFER"
-            BUFFER=""
-            _CHERRY2K_AI_MODE=1
-            _CHERRY2K_SAVED_PROMPT="$PROMPT"
-            PROMPT=$'\U1F352 '
-            # Bind Enter to AI mode accept handler
-            bindkey '^M' _cherry2k_ai_mode_accept
-            BUFFER="$current_buffer"
-            CURSOR="${#BUFFER}"
-            zle -R
-        fi
-    else
-        # In AI mode: exit
-        _cherry2k_exit_ai_mode
-        BUFFER=""
-        zle -R
-    fi
-}
+# Note: The main _cherry2k_ctrl_g_handler is now in keybindings.zsh
+# This section previously contained the handler implementation.
 
 # ============================================================================
 # Context Collection
@@ -284,15 +254,11 @@ _cherry2k_plugin_init() {
     # Register custom widgets
     zle -N self-insert _cherry2k_self_insert_wrapper
     zle -N backward-delete-char _cherry2k_backward_delete_wrapper
-    zle -N _cherry2k_ctrl_g_handler
     zle -N _cherry2k_ai_mode_accept
 
-    # Bind Ctrl+G to toggle AI mode
-    bindkey '^G' _cherry2k_ctrl_g_handler
+    # Setup keybindings (Ctrl+G, etc.)
+    _cherry2k_setup_keybindings
 
-    # Also bind for vim mode if active
-    if [[ -n "$KEYMAP" ]]; then
-        bindkey -M viins '^G' _cherry2k_ctrl_g_handler 2>/dev/null
-        bindkey -M vicmd '^G' _cherry2k_ctrl_g_handler 2>/dev/null
-    fi
+    # Setup vim bindings if vi mode is active
+    _cherry2k_setup_vim_bindings
 }

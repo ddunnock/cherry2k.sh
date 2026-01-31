@@ -18,8 +18,16 @@ typeset -g _CHERRY2K_LOADED=1
 # Plugin directory (for relative sourcing)
 typeset -g _CHERRY2K_PLUGIN_DIR="${0:A:h}"
 
+# Add completions to fpath (must be before compinit)
+fpath=("${_CHERRY2K_PLUGIN_DIR}/completions" $fpath)
+
 # Source widget files
 source "${_CHERRY2K_PLUGIN_DIR}/widgets/ai-mode.zsh"
+source "${_CHERRY2K_PLUGIN_DIR}/widgets/keybindings.zsh"
+source "${_CHERRY2K_PLUGIN_DIR}/widgets/vim-navigation.zsh"
 
 # Initialize plugin
 _cherry2k_plugin_init
+
+# Initialize completions if compinit not already run
+(( $+functions[compinit] )) || { autoload -Uz compinit && compinit -i }
