@@ -22,7 +22,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use cherry2k_core::config::Config;
 use cherry2k_core::provider::Role;
-use cherry2k_core::{AiProvider, CompletionRequest, Message, OpenAiProvider};
+use cherry2k_core::{CompletionRequest, Message, ProviderFactory};
 use cherry2k_storage::message::save_message;
 use cherry2k_storage::session::{cleanup_old_sessions, get_or_create_session};
 use cherry2k_storage::{Database, prepare_context};
@@ -129,19 +129,24 @@ pub async fn run(
 
     tracing::debug!("Using session {} in {}", session_id, working_dir.display());
 
-    // Get OpenAI config or error
-    let openai_config = config.openai.clone().ok_or_else(|| {
-        anyhow::anyhow!("OpenAI not configured. Set OPENAI_API_KEY environment variable.")
-    })?;
+    // Create provider factory from config
+    let factory = ProviderFactory::from_config(config)
+        .map_err(|e| anyhow::anyhow!("{}", e))
+        .context("Failed to initialize providers")?;
 
-    // Create and validate provider
-    let provider = OpenAiProvider::new(openai_config);
-    provider
-        .validate_config()
-        .context("Invalid OpenAI configuration")?;
+    // Check for in-session provider override
+    let active_provider_name = super::provider::get_active_provider()
+        .filter(|name| factory.contains(name))
+        .unwrap_or_else(|| factory.default_provider_name().to_string());
+
+    let provider = factory
+        .get(&active_provider_name)
+        .ok_or_else(|| anyhow::anyhow!("Provider '{}' not available", active_provider_name))?;
+
+    tracing::debug!("Using provider: {}", provider.provider_id());
 
     // Load conversation history
-    let context = prepare_context(&db, &session_id, &provider)
+    let context = prepare_context(&db, &session_id, provider)
         .await
         .context("Failed to load conversation history")?;
 

@@ -117,10 +117,10 @@ fn stored_to_message(stored: &StoredMessage) -> Message {
 /// # Errors
 ///
 /// Returns `StorageError` if database operations fail or summarization fails.
-pub async fn prepare_context<P: AiProvider>(
+pub async fn prepare_context(
     db: &Database,
     session_id: &str,
-    provider: &P,
+    provider: &dyn AiProvider,
 ) -> Result<ContextResult, StorageError> {
     // Load all messages for the session
     let messages = get_messages(db, session_id).await?;
