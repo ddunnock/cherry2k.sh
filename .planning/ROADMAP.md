@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation and Safety** - CLI skeleton with safe command execution architecture
 - [x] **Phase 2: Single Provider End-to-End** - OpenAI streaming responses working via CLI
 - [x] **Phase 3: Storage and Session Continuity** - Conversation persistence and session resume
-- [ ] **Phase 4: Zsh Integration** - The `* ` prefix inline experience
+- [x] **Phase 4: Zsh Integration** - The `* ` prefix inline experience
 - [ ] **Phase 5: Multi-Provider Support** - Anthropic, Ollama, and provider switching
 - [ ] **Phase 6: Command Execution Flow** - Intent detection and shell command execution
 - [ ] **Phase 7: File Operations** - File reading, writing, and editing with diff preview
@@ -84,9 +84,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md - ZLE widget for `* ` prefix detection and AI mode state
-- [ ] 04-02-PLAN.md - Shell context collection and AI invocation flow
-- [ ] 04-03-PLAN.md - Ctrl+G keybinding, vim navigation, and tab completions
+- [x] 04-01-PLAN.md - ZLE widget for `* ` prefix detection and AI mode state
+- [x] 04-02-PLAN.md - Shell context collection and AI invocation flow
+- [x] 04-03-PLAN.md - Ctrl+G keybinding, vim navigation, and tab completions
 
 ### Phase 5: Multi-Provider Support
 **Goal**: Support OpenAI, Anthropic, and Ollama with seamless switching
@@ -151,7 +151,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. Foundation and Safety | 3/3 | ✓ Complete | 2026-01-30 |
 | 2. Single Provider End-to-End | 3/3 | ✓ Complete | 2026-01-30 |
 | 3. Storage and Session Continuity | 3/3 | ✓ Complete | 2026-01-30 |
-| 4. Zsh Integration | 0/3 | Planned | - |
+| 4. Zsh Integration | 3/3 | ✓ Complete | 2026-01-31 |
 | 5. Multi-Provider Support | 0/3 | Not started | - |
 | 6. Command Execution Flow | 0/3 | Not started | - |
 | 7. File Operations | 0/3 | Not started | - |
@@ -188,4 +188,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 - TUI-01, TUI-02, TUI-03: TUI mode (marked optional in PROJECT.md)
 
 ---
-*Last updated: 2026-01-30*
+*Last updated: 2026-01-31*

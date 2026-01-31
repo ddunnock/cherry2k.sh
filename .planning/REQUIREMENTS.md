@@ -62,10 +62,10 @@
 |-------------|-------|--------|
 | CMD-01 | Phase 1 | Complete |
 | PROV-01 | Phase 2 | Complete |
-| TERM-03 | Phase 3 | Pending |
-| TERM-04 | Phase 3 | Pending |
-| TERM-01 | Phase 4 | Pending |
-| TERM-02 | Phase 4 | Pending |
+| TERM-03 | Phase 3 | Complete |
+| TERM-04 | Phase 3 | Complete |
+| TERM-01 | Phase 4 | Complete |
+| TERM-02 | Phase 4 | Complete |
 | PROV-02 | Phase 5 | Pending |
 | PROV-03 | Phase 5 | Pending |
 | PROV-04 | Phase 5 | Pending |
@@ -83,4 +83,4 @@
 **Coverage:** 19/19 v1 requirements mapped to phases
 
 ---
-*Last updated: 2026-01-30*
+*Last updated: 2026-01-31*
