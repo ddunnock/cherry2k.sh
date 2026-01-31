@@ -7,11 +7,12 @@
 use std::path::Path;
 
 use chrono::{DateTime, Duration, Utc};
-use rusqlite::params;
 use rusqlite::OptionalExtension;
+use rusqlite::params;
 
-use crate::connection::Database;
 use crate::StorageError;
+use crate::connection::Database;
+use crate::util::parse_datetime;
 
 /// A full session record from the database.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -77,19 +78,22 @@ pub fn generate_session_id() -> String {
 pub async fn create_session(db: &Database, working_dir: &Path) -> Result<String, StorageError> {
     let session_id = generate_session_id();
     let working_dir_str = working_dir.to_string_lossy().to_string();
-    let id_clone = session_id.clone();
 
+    let id = session_id.clone();
     db.call(move |conn| {
         conn.execute(
             "INSERT INTO sessions (id, working_dir) VALUES (?1, ?2)",
-            params![id_clone, working_dir_str],
-        )?;
-        Ok(())
+            params![id, working_dir_str],
+        )
     })
     .await
     .map_err(|e| StorageError::Database(e.to_string()))?;
 
-    tracing::debug!("Created session {} for {}", session_id, working_dir.display());
+    tracing::debug!(
+        "Created session {} for {}",
+        session_id,
+        working_dir.display()
+    );
     Ok(session_id)
 }
 
@@ -140,7 +144,11 @@ pub async fn get_or_create_session(
 
     match existing_session {
         Some(id) => {
-            tracing::debug!("Continuing existing session {} for {}", id, working_dir.display());
+            tracing::debug!(
+                "Continuing existing session {} for {}",
+                id,
+                working_dir.display()
+            );
             Ok(id)
         }
         None => create_session(db, working_dir).await,
@@ -341,16 +349,6 @@ pub async fn cleanup_old_sessions(db: &Database) -> Result<usize, StorageError> 
     Ok(rows_deleted)
 }
 
-/// Parses a SQLite datetime string into a DateTime<Utc>.
-///
-/// SQLite stores datetimes as "YYYY-MM-DD HH:MM:SS" strings.
-fn parse_datetime(s: &str) -> DateTime<Utc> {
-    // SQLite datetime format: "YYYY-MM-DD HH:MM:SS"
-    chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S")
-        .map(|dt| dt.and_utc())
-        .unwrap_or_else(|_| Utc::now())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -515,7 +513,10 @@ mod tests {
             // created_at and last_message_at should be recent
             let now = Utc::now();
             let diff = now - session.created_at;
-            assert!(diff.num_seconds() < 60, "Session should be created recently");
+            assert!(
+                diff.num_seconds() < 60,
+                "Session should be created recently"
+            );
         }
     }
 
@@ -698,31 +699,6 @@ mod tests {
             assert_eq!(count, 0);
             let session = get_session(&db, &id).await.unwrap();
             assert!(session.is_some());
-        }
-    }
-
-    mod parse_datetime {
-        use super::*;
-        use chrono::{Datelike, Timelike};
-
-        #[test]
-        fn parses_sqlite_format() {
-            let dt = parse_datetime("2026-01-30 14:23:45");
-            assert_eq!(dt.year(), 2026);
-            assert_eq!(dt.month(), 1);
-            assert_eq!(dt.day(), 30);
-            assert_eq!(dt.hour(), 14);
-            assert_eq!(dt.minute(), 23);
-            assert_eq!(dt.second(), 45);
-        }
-
-        #[test]
-        fn returns_now_for_invalid() {
-            let dt = parse_datetime("invalid");
-            let now = Utc::now();
-            // Should return current time (within a second)
-            let diff = (now - dt).num_seconds().abs();
-            assert!(diff < 5);
         }
     }
 }

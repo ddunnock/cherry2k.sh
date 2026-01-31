@@ -9,8 +9,8 @@ use std::time::Duration;
 use directories::ProjectDirs;
 use tokio_rusqlite::Connection;
 
-use crate::schema::ensure_schema;
 use crate::StorageError;
+use crate::schema::ensure_schema;
 
 /// Async SQLite database wrapper
 ///
@@ -105,7 +105,8 @@ impl Database {
             conn.execute_batch("PRAGMA foreign_keys = ON;")?;
 
             // Run schema migrations
-            ensure_schema(conn).map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+            ensure_schema(conn)
+                .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
 
             Ok::<(), rusqlite::Error>(())
         })
@@ -154,19 +155,13 @@ impl Database {
         F: FnOnce(&mut rusqlite::Connection) -> Result<R, rusqlite::Error> + Send + 'static,
         R: Send + 'static,
     {
-        self.conn
-            .call(f)
-            .await
-            .map_err(|e| match e {
-                tokio_rusqlite::Error::Error(e) => e,
-                tokio_rusqlite::Error::Close((_, e)) => e,
-                tokio_rusqlite::Error::ConnectionClosed | _ => {
-                    rusqlite::Error::SqliteFailure(
-                        rusqlite::ffi::Error::new(rusqlite::ffi::SQLITE_ABORT),
-                        Some("Connection closed or unavailable".to_string()),
-                    )
-                }
-            })
+        self.conn.call(f).await.map_err(|e| match e {
+            tokio_rusqlite::Error::Error(e) | tokio_rusqlite::Error::Close((_, e)) => e,
+            _ => rusqlite::Error::SqliteFailure(
+                rusqlite::ffi::Error::new(rusqlite::ffi::SQLITE_ABORT),
+                Some("Connection closed or unavailable".to_string()),
+            ),
+        })
     }
 
     /// Executes a closure that may return a custom error type
@@ -180,7 +175,9 @@ impl Database {
         R: Send + 'static,
     {
         self.conn
-            .call(move |conn| f(conn).map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e))))
+            .call(move |conn| {
+                f(conn).map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))
+            })
             .await
             .map_err(|e| StorageError::Database(e.to_string()))
     }
@@ -219,7 +216,10 @@ mod tests {
             .unwrap();
 
         // Should have schema_version, sessions, and messages tables
-        assert!(table_count >= 3, "Expected at least 3 tables, got {table_count}");
+        assert!(
+            table_count >= 3,
+            "Expected at least 3 tables, got {table_count}"
+        );
     }
 
     #[tokio::test]
@@ -260,9 +260,7 @@ mod tests {
 
         // Foreign keys should be enabled
         let fk_enabled: i64 = db
-            .call(|conn| {
-                conn.query_row("PRAGMA foreign_keys", [], |row| row.get(0))
-            })
+            .call(|conn| conn.query_row("PRAGMA foreign_keys", [], |row| row.get(0)))
             .await
             .unwrap();
 
@@ -278,7 +276,10 @@ mod tests {
 
         // Should contain cherry2k in the path
         let path_str = path.to_string_lossy();
-        assert!(path_str.contains("cherry2k"), "Path should contain 'cherry2k': {path_str}");
+        assert!(
+            path_str.contains("cherry2k"),
+            "Path should contain 'cherry2k': {path_str}"
+        );
     }
 
     #[tokio::test]
@@ -290,7 +291,9 @@ mod tests {
 
         let result: Result<(), StorageError> = db
             .call_storage(|_conn| {
-                Err(StorageError::SessionNotFound { id: "test".to_string() })
+                Err(StorageError::SessionNotFound {
+                    id: "test".to_string(),
+                })
             })
             .await;
 

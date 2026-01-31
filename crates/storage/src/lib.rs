@@ -38,12 +38,13 @@ pub mod context;
 pub mod message;
 mod schema;
 pub mod session;
+mod util;
 
 // Re-export the main types
 pub use connection::Database;
 
 // Re-export context types
-pub use context::{prepare_context, ContextResult};
+pub use context::{ContextResult, prepare_context};
 
 // Re-export session types
 pub use session::{Session, SessionInfo};

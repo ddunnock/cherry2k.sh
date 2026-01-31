@@ -14,9 +14,9 @@ use futures::StreamExt;
 
 use cherry2k_core::provider::{AiProvider, CompletionRequest, Message, Role};
 
-use crate::message::{delete_messages_before, get_messages, save_summary, StoredMessage};
 use crate::Database;
 use crate::StorageError;
+use crate::message::{StoredMessage, delete_messages_before, get_messages, save_summary};
 
 /// Maximum tokens for conversation history.
 const TOKEN_BUDGET: usize = 16_000;
@@ -418,7 +418,9 @@ mod tests {
         async fn returns_empty_for_no_messages() {
             let (db, _temp, session_id) = setup_with_session().await;
 
-            let result = prepare_context(&db, &session_id, &DummyProvider).await.unwrap();
+            let result = prepare_context(&db, &session_id, &DummyProvider)
+                .await
+                .unwrap();
 
             assert!(result.messages.is_empty());
             assert!(!result.was_summarized);
@@ -436,7 +438,9 @@ mod tests {
                 .await
                 .unwrap();
 
-            let result = prepare_context(&db, &session_id, &DummyProvider).await.unwrap();
+            let result = prepare_context(&db, &session_id, &DummyProvider)
+                .await
+                .unwrap();
 
             assert_eq!(result.messages.len(), 2);
             assert_eq!(result.messages[0].role, Role::User);
@@ -460,7 +464,9 @@ mod tests {
                 .await
                 .unwrap();
 
-            let result = prepare_context(&db, &session_id, &DummyProvider).await.unwrap();
+            let result = prepare_context(&db, &session_id, &DummyProvider)
+                .await
+                .unwrap();
 
             assert_eq!(result.messages.len(), 3);
             assert_eq!(result.messages[0].role, Role::System);

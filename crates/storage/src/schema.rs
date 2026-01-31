@@ -86,11 +86,9 @@ pub fn ensure_schema(conn: &Connection) -> Result<(), StorageError> {
 
     // Check current version
     let current_version: i32 = conn
-        .query_row(
-            "SELECT MAX(version) FROM schema_version",
-            [],
-            |row| row.get(0),
-        )
+        .query_row("SELECT MAX(version) FROM schema_version", [], |row| {
+            row.get(0)
+        })
         .map_err(|e| StorageError::Database(e.to_string()))?;
 
     if current_version > SCHEMA_VERSION {
@@ -206,6 +204,9 @@ mod tests {
             "INSERT INTO messages (session_id, role, content) VALUES ('nonexistent', 'user', 'test')",
             [],
         );
-        assert!(result.is_err(), "Foreign key constraint should prevent orphan messages");
+        assert!(
+            result.is_err(),
+            "Foreign key constraint should prevent orphan messages"
+        );
     }
 }

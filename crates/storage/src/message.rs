@@ -9,8 +9,9 @@ use rusqlite::params;
 
 use cherry2k_core::provider::Role;
 
-use crate::connection::Database;
 use crate::StorageError;
+use crate::connection::Database;
+use crate::util::parse_datetime;
 
 /// A stored message from the database.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -303,15 +304,8 @@ fn parse_role(s: &str) -> Role {
         "user" => Role::User,
         "assistant" => Role::Assistant,
         "system" => Role::System,
-        _ => Role::User, // Default to user for unknown roles
+        _ => Role::User,
     }
-}
-
-/// Parses a SQLite datetime string into a DateTime<Utc>.
-fn parse_datetime(s: &str) -> DateTime<Utc> {
-    chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S")
-        .map(|dt| dt.and_utc())
-        .unwrap_or_else(|_| Utc::now())
 }
 
 #[cfg(test)]
