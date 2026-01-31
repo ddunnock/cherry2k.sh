@@ -6,11 +6,31 @@
 
 use std::io::{self, Stdout, Write};
 
+use termimad::crossterm::style::Color;
+
+use super::retro::retro_color_scheme;
+
+/// ANSI escape code for the retro green color (bright green, ANSI 10)
+fn retro_green_start() -> String {
+    let colors = retro_color_scheme();
+    if let Color::AnsiValue(code) = colors.text {
+        format!("\x1b[38;5;{}m", code)
+    } else {
+        String::new()
+    }
+}
+
+/// ANSI escape code to reset colors
+const ANSI_RESET: &str = "\x1b[0m";
+
 /// Line-buffered writer for streaming AI responses.
 ///
 /// Buffers incoming chunks until a newline is encountered, then prints
 /// the complete line. This provides smoother visual output compared to
 /// character-by-character printing.
+///
+/// Applies retro 8-bit green color styling to output for the classic
+/// terminal aesthetic.
 ///
 /// # Example
 ///
@@ -19,22 +39,35 @@ use std::io::{self, Stdout, Write};
 ///
 /// let mut writer = StreamWriter::new();
 /// writer.write_chunk("Hello, ").unwrap();
-/// writer.write_chunk("world!\n").unwrap();  // Prints "Hello, world!"
+/// writer.write_chunk("world!\n").unwrap();  // Prints "Hello, world!" in green
 /// writer.write_chunk("Partial").unwrap();   // Buffered
-/// writer.flush().unwrap();                   // Prints "Partial"
+/// writer.flush().unwrap();                   // Prints "Partial" in green
 /// ```
 pub struct StreamWriter {
     buffer: String,
     stdout: Stdout,
+    /// Whether retro colors are enabled
+    use_retro_colors: bool,
 }
 
 impl StreamWriter {
-    /// Create a new line-buffered stream writer.
+    /// Create a new line-buffered stream writer with retro colors enabled.
     #[must_use]
     pub fn new() -> Self {
         Self {
             buffer: String::new(),
             stdout: io::stdout(),
+            use_retro_colors: true,
+        }
+    }
+
+    /// Create a new line-buffered stream writer without retro colors.
+    #[must_use]
+    pub fn new_plain() -> Self {
+        Self {
+            buffer: String::new(),
+            stdout: io::stdout(),
+            use_retro_colors: false,
         }
     }
 
@@ -53,7 +86,11 @@ impl StreamWriter {
         // Print all complete lines
         while let Some(newline_pos) = self.buffer.find('\n') {
             let line = self.buffer.drain(..=newline_pos).collect::<String>();
-            write!(self.stdout, "{line}")?;
+            if self.use_retro_colors {
+                write!(self.stdout, "{}{}{}", retro_green_start(), line, ANSI_RESET)?;
+            } else {
+                write!(self.stdout, "{line}")?;
+            }
             self.stdout.flush()?;
         }
 
@@ -71,7 +108,17 @@ impl StreamWriter {
     pub fn flush(&mut self) -> io::Result<()> {
         if !self.buffer.is_empty() {
             let remaining = std::mem::take(&mut self.buffer);
-            write!(self.stdout, "{remaining}")?;
+            if self.use_retro_colors {
+                write!(
+                    self.stdout,
+                    "{}{}{}",
+                    retro_green_start(),
+                    remaining,
+                    ANSI_RESET
+                )?;
+            } else {
+                write!(self.stdout, "{remaining}")?;
+            }
             self.stdout.flush()?;
         }
         Ok(())
@@ -87,6 +134,17 @@ impl StreamWriter {
 impl Default for StreamWriter {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl Drop for StreamWriter {
+    fn drop(&mut self) {
+        // Ensure ANSI reset is written on drop if we have colors enabled
+        // This prevents color bleeding if the stream is interrupted
+        if self.use_retro_colors {
+            let _ = write!(self.stdout, "{}", ANSI_RESET);
+            let _ = self.stdout.flush();
+        }
     }
 }
 
@@ -136,5 +194,18 @@ mod tests {
     fn stream_writer_default_impl() {
         let writer = StreamWriter::default();
         assert!(!writer.has_buffered_content());
+    }
+
+    #[test]
+    fn stream_writer_plain_mode() {
+        let writer = StreamWriter::new_plain();
+        assert!(!writer.has_buffered_content());
+        assert!(!writer.use_retro_colors);
+    }
+
+    #[test]
+    fn stream_writer_retro_mode_by_default() {
+        let writer = StreamWriter::new();
+        assert!(writer.use_retro_colors);
     }
 }

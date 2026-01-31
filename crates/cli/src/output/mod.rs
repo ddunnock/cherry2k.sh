@@ -17,6 +17,6 @@ mod stream_writer;
 
 pub use error_box::{display_error, display_provider_error};
 pub use markdown::render_markdown;
-pub use retro::{apply_retro_skin, retro_color_scheme, RetroColors};
+pub use retro::{RetroColors, apply_retro_skin, retro_color_scheme};
 pub use spinner::ResponseSpinner;
 pub use stream_writer::StreamWriter;

@@ -208,6 +208,8 @@ dependencies = [
  "indicatif",
  "rand",
  "sentry",
+ "serde",
+ "serde_json",
  "tempfile",
  "termimad",
  "tokio",

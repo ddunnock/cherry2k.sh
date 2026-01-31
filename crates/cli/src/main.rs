@@ -2,6 +2,8 @@
 //!
 //! Zsh terminal AI assistant with provider-agnostic architecture.
 
+use std::path::PathBuf;
+
 use anyhow::{Context, Result};
 use cherry2k_storage::Database;
 use clap::{Parser, Subcommand};
@@ -34,6 +36,9 @@ enum Commands {
         /// Output plain text without markdown rendering
         #[arg(short, long)]
         plain: bool,
+        /// Path to JSON file with shell context (for zsh integration)
+        #[arg(long)]
+        context_file: Option<PathBuf>,
     },
     /// Show current configuration
     Config,
@@ -97,8 +102,12 @@ async fn main() -> Result<()> {
 
     // Dispatch to command handlers
     match cli.command {
-        Commands::Chat { message, plain } => {
-            commands::chat::run(&config, &message, plain).await?;
+        Commands::Chat {
+            message,
+            plain,
+            context_file,
+        } => {
+            commands::chat::run(&config, &message, plain, context_file.as_deref()).await?;
         }
         Commands::Config => {
             commands::config::run(&config)?;

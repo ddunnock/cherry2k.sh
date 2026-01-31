@@ -8,7 +8,9 @@
 //! loaded and sent to the provider for context. Messages are saved after each
 //! exchange.
 
+use std::collections::HashMap;
 use std::io::{self, Write};
+use std::path::Path;
 
 use anyhow::{Context, Result};
 use cherry2k_core::config::Config;
@@ -17,10 +19,40 @@ use cherry2k_core::{AiProvider, CompletionRequest, Message, OpenAiProvider};
 use cherry2k_storage::message::save_message;
 use cherry2k_storage::session::{cleanup_old_sessions, get_or_create_session};
 use cherry2k_storage::{Database, prepare_context};
+use serde::Deserialize;
 use tokio_stream::StreamExt;
 
 use crate::output::{ResponseSpinner, StreamWriter, display_provider_error};
 use crate::signal::setup_cancellation;
+
+/// Shell context passed from zsh integration.
+#[derive(Debug, Deserialize)]
+struct ShellContext {
+    /// Current working directory
+    pwd: String,
+    /// Shell executable path
+    shell: String,
+    /// Zsh version (if zsh) - intentionally unused, reserved for Phase 6 intent detection
+    #[serde(default)]
+    #[allow(dead_code)]
+    zsh_version: Option<String>,
+    /// Recent command history
+    #[serde(default)]
+    history: Vec<HistoryEntry>,
+    /// Filtered environment variables
+    #[serde(default)]
+    env: HashMap<String, String>,
+}
+
+/// A single history entry from shell context.
+#[derive(Debug, Deserialize)]
+struct HistoryEntry {
+    /// Timestamp of the command (ISO format, optional)
+    #[serde(default)]
+    timestamp: Option<String>,
+    /// The command that was executed
+    command: String,
+}
 
 /// Run the chat command.
 ///
@@ -33,6 +65,7 @@ use crate::signal::setup_cancellation;
 /// * `config` - Application configuration
 /// * `message` - The user's message to send to the AI
 /// * `_plain` - If true, skip markdown rendering (currently unused, for future enhancement)
+/// * `context_file` - Optional path to JSON file with shell context (from zsh integration)
 ///
 /// # Errors
 ///
@@ -41,7 +74,38 @@ use crate::signal::setup_cancellation;
 /// - The API request fails
 /// - Network errors occur during streaming
 /// - Database operations fail
-pub async fn run(config: &Config, message: &str, _plain: bool) -> Result<()> {
+/// - Context file cannot be read or parsed (if provided)
+pub async fn run(
+    config: &Config,
+    message: &str,
+    _plain: bool,
+    context_file: Option<&Path>,
+) -> Result<()> {
+    // Parse shell context if provided
+    if let Some(path) = context_file {
+        let content = std::fs::read_to_string(path)
+            .with_context(|| format!("Failed to read context file: {}", path.display()))?;
+
+        let shell_context: ShellContext = serde_json::from_str(&content)
+            .with_context(|| format!("Failed to parse context file: {}", path.display()))?;
+
+        tracing::debug!(
+            "Shell context: pwd={}, shell={}, history_len={}, env_keys={:?}",
+            shell_context.pwd,
+            shell_context.shell,
+            shell_context.history.len(),
+            shell_context.env.keys().collect::<Vec<_>>()
+        );
+
+        // Log history entries at trace level
+        for entry in &shell_context.history {
+            tracing::trace!(
+                "History: {} - {}",
+                entry.timestamp.as_deref().unwrap_or("no timestamp"),
+                entry.command
+            );
+        }
+    }
     // Open database for session management
     let db = Database::open()
         .await
