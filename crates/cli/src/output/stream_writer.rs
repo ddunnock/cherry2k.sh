@@ -11,17 +11,23 @@ use termimad::crossterm::style::Color;
 use super::retro::retro_color_scheme;
 
 /// ANSI escape code for the retro green color (bright green, ANSI 10)
-fn retro_green_start() -> String {
-    let colors = retro_color_scheme();
-    if let Color::AnsiValue(code) = colors.text {
-        format!("\x1b[38;5;{}m", code)
-    } else {
-        String::new()
-    }
-}
+const RETRO_GREEN: &str = "\x1b[38;5;10m";
 
 /// ANSI escape code to reset colors
 const ANSI_RESET: &str = "\x1b[0m";
+
+/// Build the color prefix for retro mode output.
+///
+/// Returns the ANSI escape code if the color scheme uses AnsiValue,
+/// empty string otherwise.
+fn color_prefix() -> &'static str {
+    let colors = retro_color_scheme();
+    if matches!(colors.text, Color::AnsiValue(10)) {
+        RETRO_GREEN
+    } else {
+        ""
+    }
+}
 
 /// Line-buffered writer for streaming AI responses.
 ///
@@ -86,11 +92,7 @@ impl StreamWriter {
         // Print all complete lines
         while let Some(newline_pos) = self.buffer.find('\n') {
             let line = self.buffer.drain(..=newline_pos).collect::<String>();
-            if self.use_retro_colors {
-                write!(self.stdout, "{}{}{}", retro_green_start(), line, ANSI_RESET)?;
-            } else {
-                write!(self.stdout, "{line}")?;
-            }
+            self.write_styled(&line)?;
             self.stdout.flush()?;
         }
 
@@ -108,20 +110,19 @@ impl StreamWriter {
     pub fn flush(&mut self) -> io::Result<()> {
         if !self.buffer.is_empty() {
             let remaining = std::mem::take(&mut self.buffer);
-            if self.use_retro_colors {
-                write!(
-                    self.stdout,
-                    "{}{}{}",
-                    retro_green_start(),
-                    remaining,
-                    ANSI_RESET
-                )?;
-            } else {
-                write!(self.stdout, "{remaining}")?;
-            }
+            self.write_styled(&remaining)?;
             self.stdout.flush()?;
         }
         Ok(())
+    }
+
+    /// Write text with optional retro color styling.
+    fn write_styled(&mut self, text: &str) -> io::Result<()> {
+        if self.use_retro_colors {
+            write!(self.stdout, "{}{}{}", color_prefix(), text, ANSI_RESET)
+        } else {
+            write!(self.stdout, "{text}")
+        }
     }
 
     /// Check if there is buffered content that hasn't been printed.

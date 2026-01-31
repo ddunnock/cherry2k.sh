@@ -44,19 +44,12 @@ pub struct RetroColors {
 #[must_use]
 pub fn retro_color_scheme() -> RetroColors {
     RetroColors {
-        // Primary text: Bright green (classic terminal green)
         text: Color::AnsiValue(10),
-        // Headers: Bright yellow/gold
         header: Color::AnsiValue(11),
-        // Code blocks: Cyan
         code: Color::AnsiValue(14),
-        // Code block background: Black
         code_bg: Color::AnsiValue(0),
-        // Cherry emoji prompt: Magenta
         prompt: Color::AnsiValue(13),
-        // Error messages: Bright red
         error: Color::AnsiValue(9),
-        // Dimmed/secondary text: Dark gray
         dim: Color::AnsiValue(8),
     }
 }

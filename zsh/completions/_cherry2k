@@ -1,11 +1,9 @@
 #compdef cherry2k
 
-# Cherry2K completion definitions
-# Generated from clap CLI structure
+# Cherry2K zsh completions
 
 _cherry2k() {
-    local -a commands
-    commands=(
+    local -a commands=(
         'chat:Chat with AI (one-shot query)'
         'config:Show current configuration'
         'resume:Resume a previous session or list sessions'
@@ -14,8 +12,7 @@ _cherry2k() {
         'sentry-test:Test Sentry integration'
     )
 
-    local -a global_opts
-    global_opts=(
+    local -a global_opts=(
         '-l[Set log level]:level:(trace debug info warn error)'
         '--log-level[Set log level]:level:(trace debug info warn error)'
         '-h[Show help]'
@@ -51,9 +48,6 @@ _cherry2k() {
                 sentry-test)
                     _arguments \
                         '--panic[Trigger a test panic]'
-                    ;;
-                config|new|clear)
-                    # No additional arguments
                     ;;
             esac
             ;;

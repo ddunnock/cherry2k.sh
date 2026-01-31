@@ -7,46 +7,29 @@
 # Ctrl+G Handler
 # ============================================================================
 
-# Handle Ctrl+G to enter AI mode from anywhere
-# - Empty prompt: enter AI mode with "* " prefix (ready to type query)
-# - Non-empty prompt: prepend "* " to existing text and enter AI mode
+# Toggle AI mode. If in AI mode, exit. Otherwise enter with current buffer.
 _cherry2k_ctrl_g_handler() {
     if [[ $_CHERRY2K_AI_MODE -eq 1 ]]; then
-        # Already in AI mode: exit
         _cherry2k_exit_ai_mode
         BUFFER=""
         zle -R
         return
     fi
 
-    # Not in AI mode: enter AI mode
-    if [[ -z "$BUFFER" ]]; then
-        # Empty prompt: set up "* " and enter AI mode
-        BUFFER="* "
-        CURSOR=2
-        _cherry2k_enter_ai_mode
-    else
-        # Non-empty: prepend "* " and enter AI mode
-        BUFFER="* $BUFFER"
-        CURSOR=$((CURSOR + 2))
-        _cherry2k_enter_ai_mode
-    fi
+    # Enter AI mode, prepending "* " trigger
+    BUFFER="* $BUFFER"
+    CURSOR=$((${#BUFFER}))
+    _cherry2k_enter_ai_mode
 }
 
 # ============================================================================
 # Keybinding Setup
 # ============================================================================
 
-# Setup keybindings for all keymaps
+# Register Ctrl+G in main and vi keymaps
 _cherry2k_setup_keybindings() {
-    # Register the widget
     zle -N _cherry2k_ctrl_g_handler
-
-    # Bind Ctrl+G in main/emacs keymap
     bindkey '^G' _cherry2k_ctrl_g_handler
-
-    # Bind Ctrl+G in vi keymaps (if available)
-    # Use -M flag with silent failure in case vi mode not enabled
     bindkey -M viins '^G' _cherry2k_ctrl_g_handler 2>/dev/null
     bindkey -M vicmd '^G' _cherry2k_ctrl_g_handler 2>/dev/null
 }

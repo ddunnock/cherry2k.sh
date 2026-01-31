@@ -9,17 +9,8 @@
 # State Variables
 # ============================================================================
 
-# AI mode state (0 = normal, 1 = AI mode)
-typeset -g _CHERRY2K_AI_MODE=0
-
-# Saved prompt for restoration when exiting AI mode
-typeset -g _CHERRY2K_SAVED_PROMPT=""
-
-# Original self-insert widget reference
-typeset -g _CHERRY2K_ORIGINAL_SELF_INSERT=""
-
-# Original backward-delete-char widget reference
-typeset -g _CHERRY2K_ORIGINAL_BACKWARD_DELETE=""
+typeset -g _CHERRY2K_AI_MODE=0           # 0 = normal, 1 = AI mode
+typeset -g _CHERRY2K_SAVED_PROMPT=""     # Original prompt for restoration
 
 # ============================================================================
 # AI Mode Transition Functions
@@ -27,48 +18,24 @@ typeset -g _CHERRY2K_ORIGINAL_BACKWARD_DELETE=""
 
 # Enter AI mode - called when user types "* " prefix
 _cherry2k_enter_ai_mode() {
-    # Already in AI mode, do nothing
-    if [[ $_CHERRY2K_AI_MODE -eq 1 ]]; then
-        return 0
-    fi
+    [[ $_CHERRY2K_AI_MODE -eq 1 ]] && return 0
 
-    # Set AI mode flag
     _CHERRY2K_AI_MODE=1
-
-    # Save original prompt for restoration
     _CHERRY2K_SAVED_PROMPT="$PROMPT"
-
-    # Strip "* " from the left buffer (visual only)
     LBUFFER="${LBUFFER#\* }"
-
-    # Set cherry emoji prompt
     PROMPT=$'\U1F352 '
-
-    # Bind Enter to AI mode accept handler
     bindkey '^M' _cherry2k_ai_mode_accept
-
-    # Trigger redisplay
     zle -R
 }
 
 # Exit AI mode - called when user backspaces past prefix
 _cherry2k_exit_ai_mode() {
-    # Not in AI mode, do nothing
-    if [[ $_CHERRY2K_AI_MODE -eq 0 ]]; then
-        return 0
-    fi
+    [[ $_CHERRY2K_AI_MODE -eq 0 ]] && return 0
 
-    # Clear AI mode flag
     _CHERRY2K_AI_MODE=0
-
-    # Restore original prompt
     PROMPT="$_CHERRY2K_SAVED_PROMPT"
     _CHERRY2K_SAVED_PROMPT=""
-
-    # Restore original Enter keybinding
     bindkey '^M' accept-line
-
-    # Trigger redisplay
     zle -R
 }
 
@@ -76,51 +43,34 @@ _cherry2k_exit_ai_mode() {
 # ZLE Widget Wrappers
 # ============================================================================
 
-# Self-insert wrapper - detects "* " prefix
+# Self-insert wrapper - detects "* " prefix to enter AI mode
 _cherry2k_self_insert_wrapper() {
-    # Call original self-insert first
     zle .self-insert "$@"
 
-    # Not in AI mode: check for "* " prefix activation
-    if [[ $_CHERRY2K_AI_MODE -eq 0 ]]; then
-        # Detect exactly "* " (asterisk + space)
-        if [[ "$BUFFER" == "* " ]]; then
-            _cherry2k_enter_ai_mode
-        fi
+    if [[ $_CHERRY2K_AI_MODE -eq 0 && "$BUFFER" == "* " ]]; then
+        _cherry2k_enter_ai_mode
     fi
 }
 
-# Backward-delete wrapper - detects exit from AI mode
+# Backward-delete wrapper - exits AI mode when buffer becomes empty
 _cherry2k_backward_delete_wrapper() {
-    # Call original backward-delete-char first
     zle .backward-delete-char "$@"
 
-    # In AI mode: check if buffer is empty (user deleted everything)
-    if [[ $_CHERRY2K_AI_MODE -eq 1 ]]; then
-        # If buffer is empty, exit AI mode
-        if [[ -z "$BUFFER" ]]; then
-            _cherry2k_exit_ai_mode
-        fi
+    if [[ $_CHERRY2K_AI_MODE -eq 1 && -z "$BUFFER" ]]; then
+        _cherry2k_exit_ai_mode
     fi
 }
-
-# ============================================================================
-# Ctrl+G Handler (defined in keybindings.zsh, stub here for compatibility)
-# ============================================================================
-
-# Note: The main _cherry2k_ctrl_g_handler is now in keybindings.zsh
-# This section previously contained the handler implementation.
 
 # ============================================================================
 # Context Collection
 # ============================================================================
 
-# Collect shell context as JSON and write to temp file
-# Returns: Path to temp file (caller is responsible for cleanup)
-# Dependency: jq must be installed for JSON escaping
+# Collect shell context as JSON. Returns path to temp file (caller must cleanup).
+# Requires: jq
 _cherry2k_collect_context() {
     local context_depth=${CHERRY2K_CONTEXT_DEPTH:-10}
-    local context_file=$(mktemp)
+    local context_file
+    context_file=$(mktemp)
 
     # Start JSON structure
     {
@@ -133,23 +83,17 @@ _cherry2k_collect_context() {
         echo "  \"shell\": $(echo "$SHELL" | jq -Rs .),"
         echo "  \"zsh_version\": $(echo "$ZSH_VERSION" | jq -Rs .),"
 
-        # Command history (last N commands with timestamps if available)
+        # Command history (last N commands, fc -rli: reverse, list, ISO timestamp)
         echo "  \"history\": ["
-
-        # Use fc to get history with timestamps
-        # -r = reverse (newest first), -l = list, -i = ISO timestamp
         local first=1
         fc -rli -${context_depth} 2>/dev/null | while IFS= read -r line; do
-            # Parse format: "N  YYYY-MM-DD HH:MM  command" or "N  command"
-            # Try to extract timestamp and command
+            # Format: "N  YYYY-MM-DD HH:MM  command" or "N  command"
             if [[ $line =~ ^[[:space:]]*[0-9]+[[:space:]]+([0-9-]+\ [0-9:]+)[[:space:]]+(.*)$ ]]; then
-                local timestamp="${match[1]}"
-                local command="${match[2]}"
+                local timestamp="${match[1]}" command="${match[2]}"
                 [[ $first -eq 0 ]] && echo ","
                 echo -n "    {\"timestamp\":$(echo "$timestamp" | jq -Rs .),\"command\":$(echo "$command" | jq -Rs .)}"
                 first=0
             elif [[ $line =~ ^[[:space:]]*[0-9]+[[:space:]]+(.*)$ ]]; then
-                # No timestamp, just command
                 local command="${match[1]}"
                 [[ $first -eq 0 ]] && echo ","
                 echo -n "    {\"command\":$(echo "$command" | jq -Rs .)}"
@@ -159,17 +103,15 @@ _cherry2k_collect_context() {
         echo ""
         echo "  ],"
 
-        # Environment (filtered - no secrets)
+        # Environment (safe subset only)
         echo "  \"env\": {"
         echo "    \"USER\": $(echo "$USER" | jq -Rs .),"
         echo "    \"HOME\": $(echo "$HOME" | jq -Rs .),"
         echo "    \"TERM\": $(echo "$TERM" | jq -Rs .)"
         echo "  }"
-
         echo "}"
     } > "$context_file"
 
-    # Return path to temp file
     echo "$context_file"
 }
 
@@ -179,59 +121,42 @@ _cherry2k_collect_context() {
 
 # Handle Enter press in AI mode - invokes AI and displays response
 _cherry2k_ai_mode_accept() {
-    # If not in AI mode, call original accept-line
     if [[ $_CHERRY2K_AI_MODE -eq 0 ]]; then
         zle .accept-line
         return
     fi
 
-    # Extract query from buffer
     local query="$BUFFER"
-
-    # If query is empty, exit AI mode and accept empty line
     if [[ -z "$query" ]]; then
         _cherry2k_exit_ai_mode
         zle .accept-line
         return
     fi
 
-    # History prevention: Clear buffer before accept-line so history sees empty line
-    local saved_query="$query"
+    # Clear buffer before accept-line to prevent history recording
     BUFFER=""
     zle .accept-line
-
-    # Print newline to move query visually up
     print ""
 
-    # Collect context to temp file
-    local context_file=$(_cherry2k_collect_context)
+    local context_file
+    context_file=$(_cherry2k_collect_context)
+    trap '_cherry2k_cleanup_on_sigint "$context_file"' INT
 
-    # Setup SIGINT trap for cleanup during streaming
-    local _cherry2k_context_file_for_cleanup="$context_file"
-    trap '_cherry2k_cleanup_on_sigint "$_cherry2k_context_file_for_cleanup"' INT
-
-    # Invoke cherry2k chat with context file
-    cherry2k chat --context-file="$context_file" "$saved_query"
+    cherry2k chat --context-file="$context_file" "$query"
     local exit_code=$?
 
-    # Cleanup: remove context file, restore trap
     rm -f "$context_file"
     trap - INT
-
-    # Exit AI mode
     _cherry2k_exit_ai_mode
-
-    # Reset prompt
     zle .reset-prompt 2>/dev/null || true
 
     return $exit_code
 }
 
-# Cleanup handler for SIGINT during AI invocation
+# SIGINT handler - cleanup and exit AI mode
 _cherry2k_cleanup_on_sigint() {
-    local context_file="$1"
     print "\n^C (cancelled)"
-    rm -f "$context_file"
+    rm -f "$1"
     trap - INT
     _cherry2k_exit_ai_mode
     zle .reset-prompt 2>/dev/null || true
@@ -243,11 +168,6 @@ _cherry2k_cleanup_on_sigint() {
 
 # Initialize the plugin - register widgets and keybindings
 _cherry2k_plugin_init() {
-    # Store original widget references (use .self-insert for builtin)
-    _CHERRY2K_ORIGINAL_SELF_INSERT="${widgets[self-insert]}"
-    _CHERRY2K_ORIGINAL_BACKWARD_DELETE="${widgets[backward-delete-char]}"
-
-    # Initialize state
     _CHERRY2K_AI_MODE=0
     _CHERRY2K_SAVED_PROMPT=""
 
@@ -256,9 +176,6 @@ _cherry2k_plugin_init() {
     zle -N backward-delete-char _cherry2k_backward_delete_wrapper
     zle -N _cherry2k_ai_mode_accept
 
-    # Setup keybindings (Ctrl+G, etc.)
     _cherry2k_setup_keybindings
-
-    # Setup vim bindings if vi mode is active
     _cherry2k_setup_vim_bindings
 }

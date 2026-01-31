@@ -106,6 +106,7 @@ pub async fn run(
             );
         }
     }
+
     // Open database for session management
     let db = Database::open()
         .await
