@@ -8,6 +8,13 @@
 //! loaded and sent to the provider for context. Messages are saved after each
 //! exchange.
 
+/// Probability threshold for session cleanup (26/256 ≈ 10.2%).
+///
+/// On each chat completion, we roll a random u8. If it's below this threshold,
+/// we trigger cleanup of old sessions. This spreads the cleanup work across
+/// many requests rather than doing it all at once.
+const CLEANUP_PROBABILITY_THRESHOLD: u8 = 26;
+
 use std::collections::HashMap;
 use std::io::{self, Write};
 use std::path::Path;
@@ -81,6 +88,8 @@ pub async fn run(
     _plain: bool,
     context_file: Option<&Path>,
 ) -> Result<()> {
+    // TODO(Phase 5): Use _plain flag to disable markdown rendering
+
     // Parse shell context if provided
     if let Some(path) = context_file {
         let content = std::fs::read_to_string(path)
@@ -219,7 +228,7 @@ pub async fn run(
 
     // Probabilistic cleanup (~10% of the time)
     // Using random to avoid timing-based patterns
-    if rand::random::<u8>() < 26  // ~10% chance (26/256 ≈ 10.2%)
+    if rand::random::<u8>() < CLEANUP_PROBABILITY_THRESHOLD
         && let Ok(count) = cleanup_old_sessions(&db).await
         && count > 0
     {

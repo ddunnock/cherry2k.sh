@@ -299,12 +299,17 @@ pub async fn delete_messages_before(
 }
 
 /// Parses a role string into a Role enum.
+///
+/// Falls back to `Role::User` for unknown role strings.
 fn parse_role(s: &str) -> Role {
     match s {
         "user" => Role::User,
         "assistant" => Role::Assistant,
         "system" => Role::System,
-        _ => Role::User,
+        other => {
+            tracing::debug!("Unknown role '{}', defaulting to User", other);
+            Role::User
+        }
     }
 }
 

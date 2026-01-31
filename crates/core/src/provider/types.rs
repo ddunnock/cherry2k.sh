@@ -147,9 +147,9 @@ impl CompletionRequest {
     ///
     /// # Panics
     ///
-    /// Panics in debug mode if temperature is not in range 0.0..=2.0.
+    /// Panics if temperature is not in range 0.0..=2.0.
     pub fn with_temperature(mut self, temperature: f32) -> Self {
-        debug_assert!(
+        assert!(
             (0.0..=2.0).contains(&temperature),
             "Temperature must be between 0.0 and 2.0, got {temperature}"
         );
@@ -273,7 +273,6 @@ mod tests {
 
         #[test]
         #[should_panic(expected = "Temperature must be between")]
-        #[cfg(debug_assertions)]
         fn temperature_panics_on_invalid_value() {
             let _ = CompletionRequest::new().with_temperature(3.0);
         }

@@ -46,6 +46,7 @@ Summary:"#;
 /// Contains the messages ready to send to the provider and indicates
 /// whether summarization occurred.
 #[derive(Debug, Clone)]
+#[must_use = "ContextResult contains was_summarized flag that should be checked"]
 pub struct ContextResult {
     /// Messages to send to provider (converted from StoredMessage).
     pub messages: Vec<Message>,

@@ -139,9 +139,13 @@ impl Default for StreamWriter {
 }
 
 impl Drop for StreamWriter {
+    /// Ensures ANSI reset is written on drop to prevent color bleeding.
+    ///
+    /// Errors are intentionally ignored because:
+    /// 1. Panicking in `Drop` is problematic (can abort during unwinding)
+    /// 2. There's no meaningful recovery for stdout write failures at this point
+    /// 3. The worst case is color bleeding, which is cosmetic
     fn drop(&mut self) {
-        // Ensure ANSI reset is written on drop if we have colors enabled
-        // This prevents color bleeding if the stream is interrupted
         if self.use_retro_colors {
             let _ = write!(self.stdout, "{}", ANSI_RESET);
             let _ = self.stdout.flush();

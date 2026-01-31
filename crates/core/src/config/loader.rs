@@ -120,14 +120,16 @@ fn apply_env_overrides(config: &mut Config) {
 #[allow(unsafe_code)] // Required for env::set_var/remove_var in Rust 2024
 mod tests {
     use super::*;
+    use serial_test::serial;
     use std::io::Write;
     use tempfile::NamedTempFile;
 
-    // SAFETY: These tests run sequentially (cargo test runs each test in its own thread
-    // by default, but we're modifying process-global env vars). The unsafe blocks are
-    // required in Rust 2024 edition because env::set_var/remove_var can cause data races.
+    // SAFETY: These tests use #[serial] to run sequentially, preventing data races
+    // when modifying process-global env vars. The unsafe blocks are required in
+    // Rust 2024 edition because env::set_var/remove_var can cause data races.
 
     #[test]
+    #[serial]
     fn test_default_config_when_no_file() {
         // Ensure no config file exists at test path
         // SAFETY: Test environment, single-threaded test execution
@@ -144,6 +146,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_env_override() {
         // SAFETY: Test environment, single-threaded test execution
         unsafe {
@@ -163,6 +166,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_config_file_parsing() {
         let mut file = NamedTempFile::new().unwrap();
         writeln!(
@@ -194,6 +198,7 @@ confirm_commands = false
     }
 
     #[test]
+    #[serial]
     fn test_invalid_toml_returns_error() {
         let mut file = NamedTempFile::new().unwrap();
         writeln!(file, "this is not valid toml {{{{").unwrap();
@@ -213,6 +218,7 @@ confirm_commands = false
     }
 
     #[test]
+    #[serial]
     fn test_env_model_override() {
         // Test that OPENAI_MODEL env var correctly overrides the model setting
         // Note: CI may have OPENAI_API_KEY set as a secret, so we don't assert on api_key
