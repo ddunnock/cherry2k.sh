@@ -204,6 +204,7 @@ dependencies = [
  "cherry2k-storage",
  "clap",
  "colored",
+ "directories",
  "dotenvy",
  "indicatif",
  "rand",
