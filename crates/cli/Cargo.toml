@@ -28,6 +28,7 @@ colored.workspace = true
 rand.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+directories.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true
