@@ -29,5 +29,8 @@ source "${_CHERRY2K_PLUGIN_DIR}/widgets/vim-navigation.zsh"
 # Initialize plugin
 _cherry2k_plugin_init
 
+# Setup vim mode bindings if vi mode is enabled
+_cherry2k_setup_vim_bindings
+
 # Initialize completions if compinit not already run
 (( $+functions[compinit] )) || { autoload -Uz compinit && compinit -i }
