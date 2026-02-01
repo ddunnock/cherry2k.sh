@@ -136,12 +136,13 @@ Plans:
   4. User must approve file changes before write (safe mode default)
   5. Power users can enable auto-write mode via config
   6. File operations respect directory scope (no writes outside project)
-**Plans**: 3 plans
+**Plans**: 4 plans
 
 Plans:
 - [ ] 07-01-PLAN.md - File detection and safe reading with size/binary checks
 - [ ] 07-02-PLAN.md - Unified diff preview and file write approval flow
-- [ ] 07-03-PLAN.md - Safety controls, scope enforcement, and chat integration
+- [ ] 07-03-PLAN.md - Safety controls, scope enforcement, and file reading integration
+- [ ] 07-04-PLAN.md - File write proposal extraction and chat integration
 
 ## Progress
 
@@ -156,7 +157,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 4. Zsh Integration | 3/3 | ✓ Complete | 2026-01-31 |
 | 5. Multi-Provider Support | 4/4 | ✓ Complete | 2026-01-31 |
 | 6. Command Execution Flow | 4/4 | ✓ Complete | 2026-02-01 |
-| 7. File Operations | 0/3 | Not started | - |
+| 7. File Operations | 0/4 | Not started | - |
 
 ---
 
