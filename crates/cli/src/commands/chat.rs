@@ -179,6 +179,7 @@ pub async fn run(
 
     // Detect and inject file references before sending to AI
     let cwd = std::env::current_dir().context("Failed to get current directory")?;
+    let scope = files::ProjectScope::detect().context("Failed to detect project scope")?;
     let file_refs = files::detect_file_references(actual_message, &cwd);
 
     let mut file_context = String::new();
@@ -364,6 +365,15 @@ pub async fn run(
         }
     }
 
+    // Check for file write proposals in the response (after command handling)
+    if !force_question_mode {
+        let proposals = files::extract_file_proposals(&collected_response, &cwd);
+        if !proposals.is_empty() {
+            tracing::info!("AI proposed {} file change(s)", proposals.len());
+            process_file_proposals(&proposals, &scope, config).await?;
+        }
+    }
+
     // Probabilistic cleanup (~10% of the time)
     // Using random to avoid timing-based patterns
     if rand::random::<u8>() < CLEANUP_PROBABILITY_THRESHOLD
@@ -390,6 +400,79 @@ async fn run_command(command: &str, cancel_token: &CancellationToken) -> Result<
 
     if result.was_cancelled {
         println!("Command interrupted.");
+    }
+
+    Ok(())
+}
+
+/// Process file write proposals from AI response.
+///
+/// Validates each proposal for safety, displays diffs, and writes files after user approval.
+async fn process_file_proposals(
+    proposals: &[files::FileProposal],
+    scope: &files::ProjectScope,
+    config: &Config,
+) -> Result<()> {
+    use files::{validate_write_path, ValidationResult, write_file_with_approval, WriteResult};
+
+    // Handle multiple files with summary
+    if proposals.len() > 1 {
+        println!();
+        println!("AI proposes changes to {} file(s):", proposals.len());
+        for (i, proposal) in proposals.iter().enumerate() {
+            let file_type = if proposal.is_new { "new" } else { "edit" };
+            println!("  {}. {} ({})", i + 1, proposal.path.display(), file_type);
+        }
+        println!();
+    }
+
+    // Process each proposal
+    for proposal in proposals {
+        // Validate path first
+        match validate_write_path(&proposal.path, scope) {
+            ValidationResult::Ok => {
+                // Safe to proceed
+            }
+            ValidationResult::OutOfScope { path, root } => {
+                println!(
+                    "{} File is outside project scope",
+                    "Warning:".yellow()
+                );
+                println!("  File: {}", path);
+                println!("  Project root: {}", root);
+                println!("  Proceeding with extra caution...");
+                println!();
+            }
+            ValidationResult::BlockedSecrets { path } => {
+                println!(
+                    "{} Cannot write to secrets file: {}",
+                    "BLOCKED:".red(),
+                    path
+                );
+                println!("This file type is blocked for safety reasons.");
+                println!();
+                continue; // Skip this proposal entirely
+            }
+        }
+
+        // Show diff and get approval
+        let result = write_file_with_approval(
+            &proposal.path,
+            &proposal.content,
+            !config.safety.confirm_file_writes, // auto_write if confirm disabled
+        )?;
+
+        match result {
+            WriteResult::Written { path } => {
+                println!("{} {}", "Wrote:".green(), path.display());
+            }
+            WriteResult::Cancelled => {
+                println!("{} {}", "Skipped:".yellow(), proposal.path.display());
+            }
+            WriteResult::Skipped => {
+                // No changes needed (already handled by write_file_with_approval)
+            }
+        }
     }
 
     Ok(())

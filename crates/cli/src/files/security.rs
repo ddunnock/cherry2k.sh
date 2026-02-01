@@ -54,10 +54,10 @@ const BLOCKED_FILENAMES: &[&str] = &[
 /// ```
 pub fn is_secrets_file(path: &Path) -> bool {
     // Check filename against blocked list
-    if let Some(filename) = path.file_name().and_then(|f| f.to_str()) {
-        if BLOCKED_FILENAMES.contains(&filename) {
-            return true;
-        }
+    if let Some(filename) = path.file_name().and_then(|f| f.to_str())
+        && BLOCKED_FILENAMES.contains(&filename)
+    {
+        return true;
     }
 
     // Check for .aws/credentials pattern in path

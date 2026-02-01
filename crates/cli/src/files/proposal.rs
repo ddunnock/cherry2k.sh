@@ -55,14 +55,7 @@ static FILE_MARKER: LazyLock<Regex> = LazyLock::new(|| {
 /// use std::path::Path;
 /// use cherry2k::files::extract_file_proposals;
 ///
-/// let response = r#"
-/// ```rust
-/// // filename: src/main.rs
-/// fn main() {
-///     println!("Hello!");
-/// }
-/// ```
-/// "#;
+/// let response = "--- FILE: src/main.rs ---\nfn main() {}\n--- END FILE ---";
 ///
 /// let cwd = Path::new("/project");
 /// let proposals = extract_file_proposals(response, cwd);
@@ -90,16 +83,14 @@ pub fn extract_file_proposals(response: &str, cwd: &Path) -> Vec<FileProposal> {
         let content = cap.get(2).map(|m| m.as_str()).unwrap_or("");
 
         // Try inline filename first (```rust path/to/file.rs)
-        if let Some(path_str) = inline_path {
-            // Only treat as path if it looks like a file path
-            if path_str.contains('/') || path_str.contains('\\')
+        if let Some(path_str) = inline_path
+            && (path_str.contains('/') || path_str.contains('\\')
                 || path_str.ends_with(".rs") || path_str.ends_with(".toml")
-                || path_str.ends_with(".md") || path_str.ends_with(".txt") {
-                if let Some(proposal) = create_proposal(path_str, content, cwd) {
-                    proposals.push(proposal);
-                    continue;
-                }
-            }
+                || path_str.ends_with(".md") || path_str.ends_with(".txt"))
+            && let Some(proposal) = create_proposal(path_str, content, cwd)
+        {
+            proposals.push(proposal);
+            continue;
         }
 
         // Try filename comment in first two lines
@@ -109,19 +100,19 @@ pub fn extract_file_proposals(response: &str, cwd: &Path) -> Vec<FileProposal> {
             .collect::<Vec<_>>()
             .join("\n");
 
-        if let Some(cap) = FILENAME_COMMENT.captures(&first_two_lines) {
-            if let Some(path_match) = cap.get(1) {
-                let path_str = path_match.as_str().trim();
-                // Remove the filename comment line from content
-                let clean_content = content
-                    .lines()
-                    .filter(|line| !FILENAME_COMMENT.is_match(line))
-                    .collect::<Vec<_>>()
-                    .join("\n");
+        if let Some(cap) = FILENAME_COMMENT.captures(&first_two_lines)
+            && let Some(path_match) = cap.get(1)
+        {
+            let path_str = path_match.as_str().trim();
+            // Remove the filename comment line from content
+            let clean_content = content
+                .lines()
+                .filter(|line| !FILENAME_COMMENT.is_match(line))
+                .collect::<Vec<_>>()
+                .join("\n");
 
-                if let Some(proposal) = create_proposal(path_str, &clean_content, cwd) {
-                    proposals.push(proposal);
-                }
+            if let Some(proposal) = create_proposal(path_str, &clean_content, cwd) {
+                proposals.push(proposal);
             }
         }
     }
