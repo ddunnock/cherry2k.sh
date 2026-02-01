@@ -11,6 +11,7 @@ use tracing_subscriber::EnvFilter;
 
 mod commands;
 mod confirm;
+pub mod execute;
 pub mod intent;
 pub mod output;
 pub mod signal;
