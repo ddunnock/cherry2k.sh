@@ -69,11 +69,11 @@
 | PROV-02 | Phase 5 | Complete |
 | PROV-03 | Phase 5 | Complete |
 | PROV-04 | Phase 5 | Complete |
-| INTENT-01 | Phase 6 | Pending |
-| INTENT-02 | Phase 6 | Pending |
-| INTENT-03 | Phase 6 | Pending |
-| CMD-02 | Phase 6 | Pending |
-| CMD-03 | Phase 6 | Pending |
+| INTENT-01 | Phase 6 | Complete |
+| INTENT-02 | Phase 6 | Complete |
+| INTENT-03 | Phase 6 | Complete |
+| CMD-02 | Phase 6 | Complete |
+| CMD-03 | Phase 6 | Complete |
 | INTENT-04 | Phase 7 | Pending |
 | FILE-01 | Phase 7 | Pending |
 | FILE-02 | Phase 7 | Pending |
@@ -83,4 +83,4 @@
 **Coverage:** 19/19 v1 requirements mapped to phases
 
 ---
-*Last updated: 2026-01-31*
+*Last updated: 2026-02-01*
