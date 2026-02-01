@@ -341,7 +341,10 @@ mod tests {
             let config = fixtures::config_no_providers();
             let result = ProviderFactory::from_config(&config);
 
-            assert!(matches!(result, Err(ConfigError::NoProviderAvailable { .. })));
+            assert!(matches!(
+                result,
+                Err(ConfigError::NoProviderAvailable { .. })
+            ));
         }
 
         #[test]

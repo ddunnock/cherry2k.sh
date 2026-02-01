@@ -95,21 +95,16 @@ impl AiProvider for OllamaProvider {
             };
 
             // Make the request
-            let response = client
-                .post(&url)
-                .json(&body)
-                .send()
-                .await
-                .map_err(|e| {
-                    if e.is_connect() {
-                        ProviderError::Unavailable {
-                            provider: "ollama".to_string(),
-                            reason: "Ollama not running. Start with: ollama serve".to_string(),
-                        }
-                    } else {
-                        ProviderError::RequestFailed(e.to_string())
+            let response = client.post(&url).json(&body).send().await.map_err(|e| {
+                if e.is_connect() {
+                    ProviderError::Unavailable {
+                        provider: "ollama".to_string(),
+                        reason: "Ollama not running. Start with: ollama serve".to_string(),
                     }
-                })?;
+                } else {
+                    ProviderError::RequestFailed(e.to_string())
+                }
+            })?;
 
             // Check response status
             let status = response.status();

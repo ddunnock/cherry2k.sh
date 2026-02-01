@@ -7,8 +7,8 @@ use std::fs;
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
-use cherry2k_core::config::Config;
 use cherry2k_core::ProviderFactory;
+use cherry2k_core::config::Config;
 use directories::ProjectDirs;
 
 // ============================================================================

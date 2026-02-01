@@ -16,8 +16,8 @@
 
 use std::pin::Pin;
 
-use futures::future::BoxFuture;
 use futures::Stream;
+use futures::future::BoxFuture;
 
 use super::types::CompletionRequest;
 use crate::error::{ConfigError, ProviderError};

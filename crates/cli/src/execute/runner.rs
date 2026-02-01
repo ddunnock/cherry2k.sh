@@ -181,9 +181,8 @@ mod tests {
         let token_clone = token.clone();
 
         // Start a long-running command
-        let handle = tokio::spawn(async move {
-            execute_command("sleep 60", Some(token_clone)).await
-        });
+        let handle =
+            tokio::spawn(async move { execute_command("sleep 60", Some(token_clone)).await });
 
         // Give it a moment to start
         tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
@@ -192,13 +191,10 @@ mod tests {
         token.cancel();
 
         // Should complete quickly
-        let result = tokio::time::timeout(
-            tokio::time::Duration::from_secs(2),
-            handle,
-        )
-        .await
-        .expect("command should complete after cancellation")
-        .expect("join should succeed");
+        let result = tokio::time::timeout(tokio::time::Duration::from_secs(2), handle)
+            .await
+            .expect("command should complete after cancellation")
+            .expect("join should succeed");
 
         let result = result.unwrap();
         assert!(result.was_cancelled);

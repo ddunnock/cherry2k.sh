@@ -429,10 +429,7 @@ mod tests {
 
         #[test]
         fn separates_system_messages() {
-            let messages = vec![
-                Message::system("You are helpful"),
-                Message::user("Hello"),
-            ];
+            let messages = vec![Message::system("You are helpful"), Message::user("Hello")];
 
             let (system, conversation) = convert_messages(messages);
 
@@ -461,10 +458,7 @@ mod tests {
 
         #[test]
         fn handles_no_system_message() {
-            let messages = vec![
-                Message::user("Hello"),
-                Message::assistant("Hi there!"),
-            ];
+            let messages = vec![Message::user("Hello"), Message::assistant("Hi there!")];
 
             let (system, conversation) = convert_messages(messages);
 

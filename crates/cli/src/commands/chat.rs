@@ -29,10 +29,12 @@ use cherry2k_storage::{Database, prepare_context};
 use serde::Deserialize;
 use tokio_stream::StreamExt;
 
-use cherry2k::confirm::{confirm_command, edit_command, ConfirmResult};
-use cherry2k::execute::{execute_command, display_exit_status};
-use cherry2k::intent::{detect_intent, Intent};
-use cherry2k::output::{display_suggested_command, ResponseSpinner, StreamWriter, display_provider_error};
+use cherry2k::confirm::{ConfirmResult, confirm_command, edit_command};
+use cherry2k::execute::{display_exit_status, execute_command};
+use cherry2k::intent::{Intent, detect_intent};
+use cherry2k::output::{
+    ResponseSpinner, StreamWriter, display_provider_error, display_suggested_command,
+};
 use cherry2k::signal::setup_cancellation;
 
 /// Shell context passed from zsh integration.
@@ -160,13 +162,14 @@ pub async fn run(
 
     // Parse message for command mode markers
     let user_message = message.trim();
-    let (actual_message, force_command_mode) = if let Some(stripped) = user_message.strip_prefix('!') {
-        (stripped.trim(), true)
-    } else if let Some(stripped) = user_message.strip_prefix("/run ") {
-        (stripped.trim(), true)
-    } else {
-        (user_message, false)
-    };
+    let (actual_message, force_command_mode) =
+        if let Some(stripped) = user_message.strip_prefix('!') {
+            (stripped.trim(), true)
+        } else if let Some(stripped) = user_message.strip_prefix("/run ") {
+            (stripped.trim(), true)
+        } else {
+            (user_message, false)
+        };
 
     // Check for question mode marker (? suffix)
     let force_question_mode = actual_message.ends_with('?') && !force_command_mode;
@@ -257,9 +260,7 @@ pub async fn run(
 
     // Detect if response contains a command suggestion (skip if force_question_mode)
     // Intent::Question means response was just an explanation, already displayed
-    if !force_question_mode
-        && let Intent::Command(detected) = detect_intent(&collected_response)
-    {
+    if !force_question_mode && let Intent::Command(detected) = detect_intent(&collected_response) {
         // Display the command with syntax highlighting
         display_suggested_command(&detected.command, detected.context.as_deref());
 
@@ -271,7 +272,8 @@ pub async fn run(
                     println!(); // Blank line before execution
 
                     // Execute with signal handling
-                    let result = execute_command(&command_to_run, Some(cancel_token.clone())).await?;
+                    let result =
+                        execute_command(&command_to_run, Some(cancel_token.clone())).await?;
 
                     // Display exit status
                     display_exit_status(result.status);

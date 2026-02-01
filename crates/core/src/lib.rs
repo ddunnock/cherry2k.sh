@@ -30,6 +30,6 @@ pub use config::{
 };
 pub use error::{CommandError, ConfigError, ProviderError, StorageError};
 pub use provider::{
-    AiProvider, AnthropicProvider, CompletionRequest, CompletionStream, Message, OllamaProvider,
-    OpenAiProvider, ProviderFactory, Role, command_mode_system_prompt, COMMAND_MODE_PROMPT,
+    AiProvider, AnthropicProvider, COMMAND_MODE_PROMPT, CompletionRequest, CompletionStream,
+    Message, OllamaProvider, OpenAiProvider, ProviderFactory, Role, command_mode_system_prompt,
 };

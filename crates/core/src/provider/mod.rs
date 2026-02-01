@@ -61,6 +61,6 @@ pub use anthropic::AnthropicProvider;
 pub use factory::ProviderFactory;
 pub use ollama::OllamaProvider;
 pub use openai::OpenAiProvider;
+pub use system_prompts::{COMMAND_MODE_PROMPT, command_mode_system_prompt};
 pub use r#trait::{AiProvider, CompletionStream};
-pub use system_prompts::{command_mode_system_prompt, COMMAND_MODE_PROMPT};
 pub use types::{CompletionRequest, Message, Role};
