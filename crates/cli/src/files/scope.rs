@@ -91,6 +91,12 @@ impl ProjectScope {
     pub fn is_git_repo(&self) -> bool {
         self.is_git_repo
     }
+
+    /// Create a new ProjectScope for testing (test-only constructor).
+    #[cfg(test)]
+    pub(crate) fn new_for_test(root: PathBuf, is_git_repo: bool) -> Self {
+        Self { root, is_git_repo }
+    }
 }
 
 /// Find the project root by discovering the nearest git repository.
