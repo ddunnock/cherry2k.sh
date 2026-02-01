@@ -113,16 +113,17 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. AI distinguishes questions from command requests
   2. Questions receive explanatory answers
-  3. Command requests show suggested command with "Run this? [y/n]"
-  4. Confirmed commands execute in shell context (not subprocess)
-  5. Command output is visible to user
-  6. Failed commands show error with option for AI explanation
-**Plans**: TBD
+  3. Command requests show suggested command with "Run this? [y/n/e]"
+  4. Confirmed commands execute with real-time streaming output
+  5. Command output is visible to user with exit status
+  6. Failed commands show error with exit code
+**Plans**: 4 plans
 
 Plans:
-- [ ] 06-01: Intent detection logic
-- [ ] 06-02: Command suggestion and confirmation flow
-- [ ] 06-03: Shell execution and error handling
+- [ ] 06-01-PLAN.md - Intent detection module (types and response parsing)
+- [ ] 06-02-PLAN.md - Command execution with streaming output and signal handling
+- [ ] 06-03-PLAN.md - Command display with syntax highlighting and edit flow
+- [ ] 06-04-PLAN.md - CLI integration (chat command with full execution flow)
 
 ### Phase 7: File Operations
 **Goal**: Enable AI to read, write, and edit files with user approval
@@ -154,7 +155,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. Storage and Session Continuity | 3/3 | ✓ Complete | 2026-01-30 |
 | 4. Zsh Integration | 3/3 | ✓ Complete | 2026-01-31 |
 | 5. Multi-Provider Support | 4/4 | ✓ Complete | 2026-01-31 |
-| 6. Command Execution Flow | 0/3 | Not started | - |
+| 6. Command Execution Flow | 0/4 | Not started | - |
 | 7. File Operations | 0/3 | Not started | - |
 
 ---
