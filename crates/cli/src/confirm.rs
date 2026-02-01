@@ -73,8 +73,6 @@ pub fn confirm(prompt: &str, allow_edit: bool) -> io::Result<ConfirmResult> {
 ///
 /// Displays the command and asks for confirmation.
 /// Returns the user's choice (Yes, No, or Edit).
-/// Note: Used in Phase 6 (Command Execution).
-#[allow(dead_code)]
 pub fn confirm_command(command: &str) -> io::Result<ConfirmResult> {
     println!();
     println!("Suggested command:");
@@ -83,11 +81,45 @@ pub fn confirm_command(command: &str) -> io::Result<ConfirmResult> {
     confirm("Run this?", true)
 }
 
+/// Prompt user to edit a command.
+///
+/// Displays the current command and asks for a new version.
+/// If user enters empty line, returns the original command.
+///
+/// # Arguments
+/// * `original` - The original command to edit
+///
+/// # Returns
+/// The edited command (or original if unchanged)
+///
+/// # Example
+/// ```no_run
+/// use cherry2k::confirm::edit_command;
+///
+/// let edited = edit_command("ls -la").unwrap();
+/// // User can type new command or press Enter to keep original
+/// ```
+pub fn edit_command(original: &str) -> io::Result<String> {
+    println!();
+    println!("Current command: {}", original);
+    print!("Enter new command (or press Enter to keep): ");
+    io::stdout().flush()?;
+
+    let mut input = String::new();
+    io::stdin().lock().read_line(&mut input)?;
+    let edited = input.trim();
+
+    if edited.is_empty() {
+        Ok(original.to_string())
+    } else {
+        Ok(edited.to_string())
+    }
+}
+
 /// Confirm a file operation before execution.
 ///
 /// Displays the operation details and asks for confirmation.
 /// Note: Used in Phase 7 (File Operations).
-#[allow(dead_code)]
 pub fn confirm_file_operation(operation: &str, path: &str) -> io::Result<ConfirmResult> {
     println!();
     println!("{}: {}", operation, path);
@@ -98,8 +130,6 @@ pub fn confirm_file_operation(operation: &str, path: &str) -> io::Result<Confirm
 /// Check if a command matches any blocked patterns.
 ///
 /// Returns Some(pattern) if blocked, None if allowed.
-/// Note: Used in Phase 6 (Command Execution).
-#[allow(dead_code)]
 pub fn check_blocked_patterns<'a>(command: &str, patterns: &'a [String]) -> Option<&'a str> {
     patterns
         .iter()
