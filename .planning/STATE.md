@@ -116,6 +116,9 @@ Recent decisions affecting current work:
 - [06-04]: ! prefix and /run prefix force command mode
 - [06-04]: ? suffix forces question mode (skips command detection)
 - [06-04]: Let-chain pattern for combined condition and pattern match
+- [07-01]: 50KB threshold for large file warnings, 500KB hard limit
+- [07-01]: Binary detection via null bytes (8KB check) and file extensions
+- [07-01]: Heuristic detection: path separators or common file extensions
 - [07-02]: Use similar crate for unified diff generation (git-style diffs with hunks)
 - [07-02]: 3 lines of context around changes via context_radius(3)
 - [07-02]: Edit loop re-displays diff after $EDITOR changes
