@@ -3,6 +3,7 @@
 //! Zsh terminal AI assistant with provider-agnostic architecture.
 
 use std::path::PathBuf;
+use std::process::ExitCode;
 
 use anyhow::{Context, Result};
 use cherry2k_storage::Database;
@@ -87,7 +88,21 @@ fn init_sentry() -> sentry::ClientInitGuard {
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> ExitCode {
+    match run().await {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(e) => {
+            eprintln!("Error: {e:?}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+/// Main application logic.
+///
+/// Separated from main() to enable proper exit code propagation.
+/// CLI domain rule: non-zero exit on error for script integration.
+async fn run() -> Result<()> {
     // Load .env file if present (ignore errors if not found)
     let _ = dotenvy::dotenv();
 

@@ -36,6 +36,8 @@ use cherry2k::output::{
     ResponseSpinner, StreamWriter, display_provider_error, display_suggested_command,
 };
 use cherry2k::signal::setup_cancellation;
+use colored::Colorize;
+use tokio_util::sync::CancellationToken;
 
 /// Shell context passed from zsh integration.
 #[derive(Debug, Deserialize)]
@@ -262,9 +264,15 @@ pub async fn run(
     // Intent::Question means response was just an explanation, already displayed
     if !force_question_mode && let Intent::Command(detected) = detect_intent(&collected_response) {
         // Check for blocked dangerous patterns first
-        if let Some(pattern) = check_blocked_patterns(&detected.command, &config.safety.blocked_patterns) {
+        if let Some(pattern) =
+            check_blocked_patterns(&detected.command, &config.safety.blocked_patterns)
+        {
             println!();
-            println!("\x1b[31mBLOCKED:\x1b[0m Command matches dangerous pattern: {}", pattern);
+            println!(
+                "{} Command matches dangerous pattern: {}",
+                "BLOCKED:".red(),
+                pattern
+            );
             println!("This command has been blocked for safety reasons.");
             return Ok(());
         }
@@ -281,25 +289,20 @@ pub async fn run(
                 match confirm_command(&command_to_run)? {
                     ConfirmResult::Yes => {
                         // Re-check blocked patterns after edit
-                        if let Some(pattern) = check_blocked_patterns(&command_to_run, &config.safety.blocked_patterns) {
+                        if let Some(pattern) =
+                            check_blocked_patterns(&command_to_run, &config.safety.blocked_patterns)
+                        {
                             println!();
-                            println!("\x1b[31mBLOCKED:\x1b[0m Command matches dangerous pattern: {}", pattern);
+                            println!(
+                                "{} Command matches dangerous pattern: {}",
+                                "BLOCKED:".red(),
+                                pattern
+                            );
                             println!("This command has been blocked for safety reasons.");
                             return Ok(());
                         }
 
-                        println!(); // Blank line before execution
-
-                        // Execute with signal handling
-                        let result =
-                            execute_command(&command_to_run, Some(cancel_token.clone())).await?;
-
-                        // Display exit status
-                        display_exit_status(result.status);
-
-                        if result.was_cancelled {
-                            println!("Command interrupted.");
-                        }
+                        run_command(&command_to_run, &cancel_token).await?;
                         break;
                     }
                     ConfirmResult::No => {
@@ -316,17 +319,7 @@ pub async fn run(
             }
         } else {
             // Auto-execute without confirmation (confirm_commands = false)
-            println!(); // Blank line before execution
-
-            // Execute with signal handling
-            let result = execute_command(&command_to_run, Some(cancel_token.clone())).await?;
-
-            // Display exit status
-            display_exit_status(result.status);
-
-            if result.was_cancelled {
-                println!("Command interrupted.");
-            }
+            run_command(&command_to_run, &cancel_token).await?;
         }
     }
 
@@ -337,6 +330,25 @@ pub async fn run(
         && count > 0
     {
         tracing::debug!("Cleaned up {} old sessions", count);
+    }
+
+    Ok(())
+}
+
+/// Execute a command with signal handling and display results.
+///
+/// Extracted helper to reduce duplication in the confirmation and auto-execute paths.
+async fn run_command(command: &str, cancel_token: &CancellationToken) -> Result<()> {
+    println!(); // Blank line before execution
+
+    // Execute with signal handling
+    let result = execute_command(command, Some(cancel_token.clone())).await?;
+
+    // Display exit status
+    display_exit_status(result.status);
+
+    if result.was_cancelled {
+        println!("Command interrupted.");
     }
 
     Ok(())

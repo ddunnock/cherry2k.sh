@@ -27,12 +27,13 @@ use colored::Colorize;
 /// display_exit_status(status);
 /// ```
 pub fn display_exit_status(status: ExitStatus) {
+    // Status messages go to stderr (data to stdout, metadata to stderr)
     if status.success() {
-        println!("{}", "OK".green());
+        eprintln!("{}", "OK".green());
     } else {
         match status.code() {
             Some(code) => {
-                println!("{}", format!("FAILED (exit {})", code).red());
+                eprintln!("{}", format!("FAILED (exit {})", code).red());
             }
             None => {
                 // Process terminated by signal
@@ -40,14 +41,14 @@ pub fn display_exit_status(status: ExitStatus) {
                 {
                     use std::os::unix::process::ExitStatusExt;
                     if let Some(sig) = status.signal() {
-                        println!("{}", format!("Terminated by signal {}", sig).yellow());
+                        eprintln!("{}", format!("Terminated by signal {}", sig).yellow());
                     } else {
-                        println!("{}", "Terminated abnormally".yellow());
+                        eprintln!("{}", "Terminated abnormally".yellow());
                     }
                 }
                 #[cfg(not(unix))]
                 {
-                    println!("{}", "Terminated abnormally".yellow());
+                    eprintln!("{}", "Terminated abnormally".yellow());
                 }
             }
         }

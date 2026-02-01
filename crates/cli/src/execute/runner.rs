@@ -152,7 +152,7 @@ pub async fn execute_command(
                 tracing::warn!("Process did not exit after SIGINT, sending SIGKILL");
                 #[cfg(unix)]
                 if let Some(id) = child_id {
-                    use nix::sys::signal::{kill, Signal};
+                    use nix::sys::signal::{Signal, kill};
                     use nix::unistd::Pid;
                     if let Ok(pid_i32) = i32::try_from(id) {
                         let _ = kill(Pid::from_raw(pid_i32), Signal::SIGKILL);

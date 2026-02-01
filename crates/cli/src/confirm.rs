@@ -6,6 +6,10 @@
 
 use std::io::{self, BufRead, Write};
 
+/// Maximum retries for invalid input before defaulting to No.
+/// Prevents infinite loops on malformed input streams.
+const MAX_RETRIES: usize = 10;
+
 /// Result of a confirmation prompt
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConfirmResult {
@@ -42,7 +46,7 @@ pub enum ConfirmResult {
 pub fn confirm(prompt: &str, allow_edit: bool) -> io::Result<ConfirmResult> {
     let options = if allow_edit { "[y/n/e]" } else { "[y/n]" };
 
-    loop {
+    for _ in 0..MAX_RETRIES {
         print!("{} {} ", prompt, options);
         io::stdout().flush()?;
 
@@ -60,13 +64,17 @@ pub fn confirm(prompt: &str, allow_edit: bool) -> io::Result<ConfirmResult> {
             }
             _ => {
                 if allow_edit {
-                    println!("Please enter 'y' for yes, 'n' for no, or 'e' to edit.");
+                    eprintln!("Please enter 'y' for yes, 'n' for no, or 'e' to edit.");
                 } else {
-                    println!("Please enter 'y' for yes or 'n' for no.");
+                    eprintln!("Please enter 'y' for yes or 'n' for no.");
                 }
             }
         }
     }
+
+    // After MAX_RETRIES invalid inputs, default to No for safety
+    eprintln!("Too many invalid inputs, defaulting to 'no'.");
+    Ok(ConfirmResult::No)
 }
 
 /// Confirm a potentially dangerous command before execution.

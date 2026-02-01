@@ -84,7 +84,10 @@ pub fn setup_cancellation() -> CancellationToken {
                 }
             })
             .await
-            .unwrap_or(false);
+            .unwrap_or_else(|e| {
+                tracing::warn!("Confirmation task panicked: {:?}", e);
+                false
+            });
 
             if confirmed {
                 token_clone.cancel();
