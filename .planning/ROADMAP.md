@@ -136,12 +136,12 @@ Plans:
   4. User must approve file changes before write (safe mode default)
   5. Power users can enable auto-write mode via config
   6. File operations respect directory scope (no writes outside project)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 07-01: File reading and context injection
-- [ ] 07-02: Diff preview and file write flow
-- [ ] 07-03: Safety controls and scope enforcement
+- [ ] 07-01-PLAN.md - File detection and safe reading with size/binary checks
+- [ ] 07-02-PLAN.md - Unified diff preview and file write approval flow
+- [ ] 07-03-PLAN.md - Safety controls, scope enforcement, and chat integration
 
 ## Progress
 
