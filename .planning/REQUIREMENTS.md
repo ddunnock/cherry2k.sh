@@ -74,11 +74,11 @@
 | INTENT-03 | Phase 6 | Complete |
 | CMD-02 | Phase 6 | Complete |
 | CMD-03 | Phase 6 | Complete |
-| INTENT-04 | Phase 7 | Pending |
-| FILE-01 | Phase 7 | Pending |
-| FILE-02 | Phase 7 | Pending |
-| FILE-03 | Phase 7 | Pending |
-| FILE-04 | Phase 7 | Pending |
+| INTENT-04 | Phase 7 | Complete |
+| FILE-01 | Phase 7 | Complete |
+| FILE-02 | Phase 7 | Complete |
+| FILE-03 | Phase 7 | Complete |
+| FILE-04 | Phase 7 | Complete |
 
 **Coverage:** 19/19 v1 requirements mapped to phases
 

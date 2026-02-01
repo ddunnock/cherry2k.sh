@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Zsh Integration** - The `* ` prefix inline experience
 - [x] **Phase 5: Multi-Provider Support** - Anthropic, Ollama, and provider switching
 - [x] **Phase 6: Command Execution Flow** - Intent detection and shell command execution
-- [ ] **Phase 7: File Operations** - File reading, writing, and editing with diff preview
+- [x] **Phase 7: File Operations** - File reading, writing, and editing with diff preview
 
 ## Phase Details
 
@@ -139,10 +139,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 07-01-PLAN.md - File detection and safe reading with size/binary checks
-- [ ] 07-02-PLAN.md - Unified diff preview and file write approval flow
-- [ ] 07-03-PLAN.md - Safety controls, scope enforcement, and file reading integration
-- [ ] 07-04-PLAN.md - File write proposal extraction and chat integration
+- [x] 07-01-PLAN.md - File detection and safe reading with size/binary checks
+- [x] 07-02-PLAN.md - Unified diff preview and file write approval flow
+- [x] 07-03-PLAN.md - Safety controls, scope enforcement, and file reading integration
+- [x] 07-04-PLAN.md - File write proposal extraction and chat integration
 
 ## Progress
 
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 4. Zsh Integration | 3/3 | ✓ Complete | 2026-01-31 |
 | 5. Multi-Provider Support | 4/4 | ✓ Complete | 2026-01-31 |
 | 6. Command Execution Flow | 4/4 | ✓ Complete | 2026-02-01 |
-| 7. File Operations | 0/4 | Not started | - |
+| 7. File Operations | 4/4 | ✓ Complete | 2026-02-01 |
 
 ---
 
