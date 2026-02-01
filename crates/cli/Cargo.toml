@@ -35,6 +35,9 @@ serde_json.workspace = true
 directories.workspace = true
 nix.workspace = true
 regex.workspace = true
+walkdir.workspace = true
+edit.workspace = true
+similar.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true
