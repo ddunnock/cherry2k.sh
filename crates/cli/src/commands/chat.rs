@@ -22,14 +22,17 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use cherry2k_core::config::Config;
 use cherry2k_core::provider::Role;
-use cherry2k_core::{CompletionRequest, Message, ProviderFactory};
+use cherry2k_core::{CompletionRequest, Message, ProviderFactory, command_mode_system_prompt};
 use cherry2k_storage::message::save_message;
 use cherry2k_storage::session::{cleanup_old_sessions, get_or_create_session};
 use cherry2k_storage::{Database, prepare_context};
 use serde::Deserialize;
 use tokio_stream::StreamExt;
 
-use cherry2k::output::{ResponseSpinner, StreamWriter, display_provider_error};
+use cherry2k::confirm::{confirm_command, edit_command, ConfirmResult};
+use cherry2k::execute::{execute_command, display_exit_status};
+use cherry2k::intent::{detect_intent, Intent};
+use cherry2k::output::{display_suggested_command, ResponseSpinner, StreamWriter, display_provider_error};
 use cherry2k::signal::setup_cancellation;
 
 /// Shell context passed from zsh integration.
@@ -155,17 +158,38 @@ pub async fn run(
         println!("(context summarized)");
     }
 
-    // Save user message before sending request
-    save_message(&db, &session_id, Role::User, message, None)
+    // Parse message for command mode markers
+    let user_message = message.trim();
+    let (actual_message, force_command_mode) = if let Some(stripped) = user_message.strip_prefix('!') {
+        (stripped.trim(), true)
+    } else if let Some(stripped) = user_message.strip_prefix("/run ") {
+        (stripped.trim(), true)
+    } else {
+        (user_message, false)
+    };
+
+    // Check for question mode marker (? suffix)
+    let force_question_mode = actual_message.ends_with('?') && !force_command_mode;
+
+    // Save user message before sending request (use actual_message for cleaner history)
+    save_message(&db, &session_id, Role::User, actual_message, None)
         .await
         .context("Failed to save message")?;
 
     // Build request with history + new message
+    // Always include command mode system prompt - AI decides based on context
     let request = CompletionRequest::new()
+        .with_message(Message::system(command_mode_system_prompt()))
         .with_messages(context.messages)
-        .with_message(Message::user(message));
+        .with_message(Message::user(actual_message));
 
-    // Setup cancellation handler
+    tracing::debug!(
+        "Request mode: force_command={}, force_question={}",
+        force_command_mode,
+        force_question_mode
+    );
+
+    // Setup cancellation handler (before streaming, can be reused for command execution)
     let cancel_token = setup_cancellation();
 
     // Show spinner while waiting for initial response
@@ -230,6 +254,44 @@ pub async fn run(
     save_message(&db, &session_id, Role::Assistant, &collected_response, None)
         .await
         .context("Failed to save response")?;
+
+    // Detect if response contains a command suggestion (skip if force_question_mode)
+    if !force_question_mode {
+        if let Intent::Command(detected) = detect_intent(&collected_response) {
+            // Display the command with syntax highlighting
+            display_suggested_command(&detected.command, detected.context.as_deref());
+
+            // Ask for confirmation
+            let mut command_to_run = detected.command.clone();
+            loop {
+                match confirm_command(&command_to_run)? {
+                    ConfirmResult::Yes => {
+                        println!(); // Blank line before execution
+
+                        // Execute with signal handling
+                        let result = execute_command(&command_to_run, Some(cancel_token.clone())).await?;
+
+                        // Display exit status
+                        display_exit_status(result.status);
+
+                        if result.was_cancelled {
+                            println!("Command interrupted.");
+                        }
+                        break;
+                    }
+                    ConfirmResult::No => {
+                        println!("Command cancelled.");
+                        break;
+                    }
+                    ConfirmResult::Edit => {
+                        command_to_run = edit_command(&command_to_run)?;
+                        // Loop continues to re-confirm
+                    }
+                }
+            }
+        }
+        // Intent::Question means response was just an explanation, already displayed
+    }
 
     // Probabilistic cleanup (~10% of the time)
     // Using random to avoid timing-based patterns
