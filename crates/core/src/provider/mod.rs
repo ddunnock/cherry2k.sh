@@ -53,6 +53,7 @@ mod factory;
 mod ollama;
 mod openai;
 pub mod sse;
+mod system_prompts;
 mod r#trait;
 mod types;
 
@@ -61,4 +62,5 @@ pub use factory::ProviderFactory;
 pub use ollama::OllamaProvider;
 pub use openai::OpenAiProvider;
 pub use r#trait::{AiProvider, CompletionStream};
+pub use system_prompts::{command_mode_system_prompt, COMMAND_MODE_PROMPT};
 pub use types::{CompletionRequest, Message, Role};
