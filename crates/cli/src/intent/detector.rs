@@ -67,6 +67,7 @@ mod tests {
                 assert_eq!(cmd.command, "ls -la");
             }
             Intent::Question => panic!("Expected Command intent"),
+            Intent::FileOperation(_) => panic!("Expected Command intent, got FileOperation"),
         }
     }
 
@@ -79,6 +80,7 @@ mod tests {
                 assert_eq!(cmd.command, "echo hello");
             }
             Intent::Question => panic!("Expected Command intent"),
+            Intent::FileOperation(_) => panic!("Expected Command intent, got FileOperation"),
         }
     }
 
@@ -91,6 +93,7 @@ mod tests {
                 assert_eq!(cmd.command, "pwd");
             }
             Intent::Question => panic!("Expected Command intent"),
+            Intent::FileOperation(_) => panic!("Expected Command intent, got FileOperation"),
         }
     }
 
@@ -126,6 +129,7 @@ mod tests {
                 assert!(cmd.command.contains("done"));
             }
             Intent::Question => panic!("Expected Command intent"),
+            Intent::FileOperation(_) => panic!("Expected Command intent, got FileOperation"),
         }
     }
 
@@ -140,6 +144,7 @@ mod tests {
                 assert!(cmd.context.as_ref().unwrap().contains("list files"));
             }
             Intent::Question => panic!("Expected Command intent"),
+            Intent::FileOperation(_) => panic!("Expected Command intent, got FileOperation"),
         }
     }
 
@@ -166,6 +171,7 @@ mod tests {
                 assert_eq!(cmd.command, "echo first");
             }
             Intent::Question => panic!("Expected Command intent"),
+            Intent::FileOperation(_) => panic!("Expected Command intent, got FileOperation"),
         }
     }
 
@@ -179,6 +185,7 @@ mod tests {
                 assert!(cmd.context.is_none());
             }
             Intent::Question => panic!("Expected Command intent"),
+            Intent::FileOperation(_) => panic!("Expected Command intent, got FileOperation"),
         }
     }
 
@@ -191,6 +198,7 @@ mod tests {
                 assert_eq!(cmd.command, "ls -la");
             }
             Intent::Question => panic!("Expected Command intent"),
+            Intent::FileOperation(_) => panic!("Expected Command intent, got FileOperation"),
         }
     }
 
@@ -204,6 +212,7 @@ mod tests {
                 assert!(cmd.context.is_some());
             }
             Intent::Question => panic!("Expected Command intent"),
+            Intent::FileOperation(_) => panic!("Expected Command intent, got FileOperation"),
         }
     }
 }

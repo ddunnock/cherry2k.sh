@@ -2,6 +2,8 @@
 //!
 //! Types for distinguishing AI responses that suggest commands from explanatory answers.
 
+use crate::files::FileProposal;
+
 /// Detected intent from AI response
 #[derive(Debug, Clone)]
 pub enum Intent {
@@ -9,6 +11,8 @@ pub enum Intent {
     Question,
     /// AI suggested a command to execute
     Command(DetectedCommand),
+    /// AI proposed file write operations
+    FileOperation(Vec<FileProposal>),
 }
 
 /// A command detected in AI response
