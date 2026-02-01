@@ -38,6 +38,7 @@ regex.workspace = true
 walkdir.workspace = true
 edit.workspace = true
 similar.workspace = true
+git2.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true

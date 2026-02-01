@@ -12,9 +12,11 @@
 mod detector;
 mod diff;
 mod reader;
+mod scope;
 mod writer;
 
 pub use detector::{detect_file_references, is_file_reference};
 pub use diff::{display_new_file_preview, generate_diff, has_changes};
 pub use reader::{FileReader, ReadResult};
+pub use scope::{ProjectScope, find_project_root};
 pub use writer::{write_file_with_approval, write_multiple_files, WriteResult};
