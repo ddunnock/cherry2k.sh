@@ -3,6 +3,11 @@
 //! This module provides user confirmation prompts for safety-critical operations.
 //! It is used to ensure the user explicitly approves AI-suggested commands before
 //! they are executed.
+//!
+//! Functions are used by main.rs in Phase 06-04 CLI integration.
+
+// Public API for command execution flow - used in 06-04
+#![allow(dead_code)]
 
 use std::io::{self, BufRead, Write};
 

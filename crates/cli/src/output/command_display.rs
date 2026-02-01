@@ -20,11 +20,11 @@ pub fn display_suggested_command(command: &str, context: Option<&str>) {
     let skin = MadSkin::default();
 
     // Display context if provided
-    if let Some(ctx) = context {
-        if !ctx.is_empty() {
-            println!();
-            skin.print_text(ctx);
-        }
+    if let Some(ctx) = context
+        && !ctx.is_empty()
+    {
+        println!();
+        skin.print_text(ctx);
     }
 
     // Format as markdown code block

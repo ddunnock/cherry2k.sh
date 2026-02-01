@@ -5,11 +5,13 @@
 //!
 //! # Modules
 //!
+//! - [`confirm`] - User confirmation prompts for safety-critical operations
 //! - [`execute`] - Async command execution with streaming output
+//! - [`intent`] - AI response intent detection
 //! - [`output`] - Terminal output formatting (markdown, spinner, streaming)
 //! - [`signal`] - Ctrl+C signal handling with confirmation
-//! - [`intent`] - AI response intent detection
 
+pub mod confirm;
 pub mod execute;
 pub mod intent;
 pub mod output;
