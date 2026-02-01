@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Seamless AI assistance without context switching - you stay in your terminal, in your flow.
-**Current focus:** Phase 6 - Command Execution Flow
+**Current focus:** Phase 6 - Command Execution Flow (COMPLETE)
 
 ## Current Position
 
 Phase: 6 of 7 (Command Execution Flow)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-01 - Completed 06-03-PLAN.md (Command Display)
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-01 - Completed 06-04-PLAN.md (CLI Integration)
 
-Progress: [####################-] 97%
+Progress: [#####################] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
+- Total plans completed: 20
 - Average duration: 3.6 min
-- Total execution time: 68 min
+- Total execution time: 71 min
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [####################-] 97%
 | 03-storage-and-session-continuity | 3 | 14 min | 4.7 min |
 | 04-zsh-integration | 3 | 11 min | 3.7 min |
 | 05-multi-provider-support | 4 | 14 min | 3.5 min |
-| 06-command-execution-flow | 3 | 10 min | 3.3 min |
+| 06-command-execution-flow | 4 | 13 min | 3.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-04 (5 min), 06-01 (2.5 min), 06-02 (5 min), 06-03 (3 min)
-- Trend: Steady execution, Phase 06 Wave 2 complete
+- Last 5 plans: 06-01 (2.5 min), 06-02 (5 min), 06-03 (3 min), 06-04 (3 min)
+- Trend: Steady execution, Phase 06 COMPLETE
 
 *Updated after each plan completion*
 
@@ -111,6 +111,10 @@ Recent decisions affecting current work:
 - [06-03]: MadSkin::default() for termimad bash syntax highlighting
 - [06-03]: Module-level #![allow(dead_code)] for confirm.rs public API
 - [06-03]: Empty edit input returns original command unchanged
+- [06-04]: System prompt always included - AI decides command vs explanation based on context
+- [06-04]: ! prefix and /run prefix force command mode
+- [06-04]: ? suffix forces question mode (skips command detection)
+- [06-04]: Let-chain pattern for combined condition and pattern match
 
 ### Pending Todos
 
@@ -123,7 +127,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-01T00:23:26Z
-Stopped at: Completed 06-03-PLAN.md (Command Display)
+Last session: 2026-02-01T00:29:44Z
+Stopped at: Completed 06-04-PLAN.md (CLI Integration) - Phase 06 COMPLETE
 Resume file: None
-Next: 06-04-PLAN.md (CLI Integration) - Wave 3
+Next: Phase 07 - File Operations
