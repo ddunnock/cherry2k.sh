@@ -23,5 +23,7 @@
 //! ```
 
 mod output;
+mod runner;
 
 pub use output::display_exit_status;
+pub use runner::{execute_command, CommandResult};
