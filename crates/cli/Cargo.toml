@@ -6,6 +6,10 @@ authors.workspace = true
 license.workspace = true
 description = "Zsh terminal AI assistant"
 
+[lib]
+name = "cherry2k"
+path = "src/lib.rs"
+
 [[bin]]
 name = "cherry2k"
 path = "src/main.rs"

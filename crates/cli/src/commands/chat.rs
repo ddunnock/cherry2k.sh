@@ -29,8 +29,8 @@ use cherry2k_storage::{Database, prepare_context};
 use serde::Deserialize;
 use tokio_stream::StreamExt;
 
-use crate::output::{ResponseSpinner, StreamWriter, display_provider_error};
-use crate::signal::setup_cancellation;
+use cherry2k::output::{ResponseSpinner, StreamWriter, display_provider_error};
+use cherry2k::signal::setup_cancellation;
 
 /// Shell context passed from zsh integration.
 #[derive(Debug, Deserialize)]
