@@ -36,7 +36,7 @@ pub struct RetroColors {
 /// # Example
 ///
 /// ```
-/// use cherry2k_cli::output::retro_color_scheme;
+/// use cherry2k::output::retro_color_scheme;
 ///
 /// let colors = retro_color_scheme();
 /// // Use colors.text for main prose, colors.header for headings, etc.
@@ -70,7 +70,7 @@ pub fn retro_color_scheme() -> RetroColors {
 ///
 /// ```
 /// use termimad::MadSkin;
-/// use cherry2k_cli::output::apply_retro_skin;
+/// use cherry2k::output::apply_retro_skin;
 ///
 /// let mut skin = MadSkin::default();
 /// apply_retro_skin(&mut skin);

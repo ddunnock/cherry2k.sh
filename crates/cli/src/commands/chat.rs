@@ -256,41 +256,41 @@ pub async fn run(
         .context("Failed to save response")?;
 
     // Detect if response contains a command suggestion (skip if force_question_mode)
-    if !force_question_mode {
-        if let Intent::Command(detected) = detect_intent(&collected_response) {
-            // Display the command with syntax highlighting
-            display_suggested_command(&detected.command, detected.context.as_deref());
+    // Intent::Question means response was just an explanation, already displayed
+    if !force_question_mode
+        && let Intent::Command(detected) = detect_intent(&collected_response)
+    {
+        // Display the command with syntax highlighting
+        display_suggested_command(&detected.command, detected.context.as_deref());
 
-            // Ask for confirmation
-            let mut command_to_run = detected.command.clone();
-            loop {
-                match confirm_command(&command_to_run)? {
-                    ConfirmResult::Yes => {
-                        println!(); // Blank line before execution
+        // Ask for confirmation
+        let mut command_to_run = detected.command.clone();
+        loop {
+            match confirm_command(&command_to_run)? {
+                ConfirmResult::Yes => {
+                    println!(); // Blank line before execution
 
-                        // Execute with signal handling
-                        let result = execute_command(&command_to_run, Some(cancel_token.clone())).await?;
+                    // Execute with signal handling
+                    let result = execute_command(&command_to_run, Some(cancel_token.clone())).await?;
 
-                        // Display exit status
-                        display_exit_status(result.status);
+                    // Display exit status
+                    display_exit_status(result.status);
 
-                        if result.was_cancelled {
-                            println!("Command interrupted.");
-                        }
-                        break;
+                    if result.was_cancelled {
+                        println!("Command interrupted.");
                     }
-                    ConfirmResult::No => {
-                        println!("Command cancelled.");
-                        break;
-                    }
-                    ConfirmResult::Edit => {
-                        command_to_run = edit_command(&command_to_run)?;
-                        // Loop continues to re-confirm
-                    }
+                    break;
+                }
+                ConfirmResult::No => {
+                    println!("Command cancelled.");
+                    break;
+                }
+                ConfirmResult::Edit => {
+                    command_to_run = edit_command(&command_to_run)?;
+                    // Loop continues to re-confirm
                 }
             }
         }
-        // Intent::Question means response was just an explanation, already displayed
     }
 
     // Probabilistic cleanup (~10% of the time)
