@@ -1,10 +1,10 @@
 //! Exit status display formatting for command execution.
 //!
 //! Provides user-friendly display of command exit status with appropriate
-//! colors and symbols:
-//! - Success: Green checkmark with "exit 0"
-//! - Failure: Red X with exit code
-//! - Signal termination: Yellow warning with signal number
+//! colors:
+//! - Success: Green "OK"
+//! - Failure: Red "FAILED (exit N)"
+//! - Signal termination: Yellow "Terminated by signal N"
 
 use std::process::ExitStatus;
 
@@ -13,9 +13,9 @@ use colored::Colorize;
 /// Display the exit status of a completed command.
 ///
 /// Shows:
-/// - Green checkmark with "exit 0" on success
-/// - Red X with exit code on failure
-/// - Yellow warning for signal termination
+/// - Green "OK" on success
+/// - Red "FAILED (exit N)" with exit code on failure
+/// - Yellow "Terminated by signal N" for signal termination
 ///
 /// # Example
 ///
@@ -40,10 +40,7 @@ pub fn display_exit_status(status: ExitStatus) {
                 {
                     use std::os::unix::process::ExitStatusExt;
                     if let Some(sig) = status.signal() {
-                        println!(
-                            "{}",
-                            format!("Terminated by signal {}", sig).yellow()
-                        );
+                        println!("{}", format!("Terminated by signal {}", sig).yellow());
                     } else {
                         println!("{}", "Terminated abnormally".yellow());
                     }
@@ -81,10 +78,7 @@ mod tests {
     #[test]
     fn display_exit_status_runs_without_panic_on_exit_code() {
         // Use sh -c to get a specific exit code
-        let status = Command::new("sh")
-            .args(["-c", "exit 42"])
-            .status()
-            .unwrap();
+        let status = Command::new("sh").args(["-c", "exit 42"]).status().unwrap();
         display_exit_status(status);
         // If we get here without panic, the test passes
     }

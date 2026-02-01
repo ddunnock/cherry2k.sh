@@ -3,11 +3,6 @@
 //! This module provides user confirmation prompts for safety-critical operations.
 //! It is used to ensure the user explicitly approves AI-suggested commands before
 //! they are executed.
-//!
-//! Functions are used by main.rs in Phase 06-04 CLI integration.
-
-// Public API for command execution flow - used in 06-04
-#![allow(dead_code)]
 
 use std::io::{self, BufRead, Write};
 
@@ -124,7 +119,7 @@ pub fn edit_command(original: &str) -> io::Result<String> {
 /// Confirm a file operation before execution.
 ///
 /// Displays the operation details and asks for confirmation.
-/// Note: Used in Phase 7 (File Operations).
+#[allow(dead_code)] // Reserved for Phase 7 (File Operations)
 pub fn confirm_file_operation(operation: &str, path: &str) -> io::Result<ConfirmResult> {
     println!();
     println!("{}: {}", operation, path);

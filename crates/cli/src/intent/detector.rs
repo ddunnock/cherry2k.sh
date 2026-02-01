@@ -2,16 +2,16 @@
 //!
 //! Parses AI responses to detect command suggestions in bash/sh/shell code blocks.
 
-use regex::Regex;
 use std::sync::LazyLock;
+
+use regex::Regex;
 
 use super::types::{DetectedCommand, Intent};
 
 /// Regex pattern for bash/sh/shell code blocks.
 /// Captures the content between ```bash/sh/shell and ```.
-static CODE_BLOCK_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"```(?:bash|sh|shell)\n([\s\S]*?)\n```").expect("valid regex")
-});
+static CODE_BLOCK_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"```(?:bash|sh|shell)\n([\s\S]*?)\n```").expect("valid regex"));
 
 /// Detect intent from an AI response.
 ///
@@ -39,18 +39,12 @@ pub fn parse_command_from_response(response: &str) -> Option<DetectedCommand> {
         return None;
     }
 
-    // Find text before the code block (context)
+    // Extract context text before the code block (if any)
     let match_start = captures.get(0)?.start();
-    let context = if match_start > 0 {
-        let before = response[..match_start].trim();
-        if before.is_empty() {
-            None
-        } else {
-            Some(before.to_string())
-        }
-    } else {
-        None
-    };
+    let context = (match_start > 0)
+        .then(|| response[..match_start].trim())
+        .filter(|s| !s.is_empty())
+        .map(str::to_string);
 
     Some(DetectedCommand {
         command: command.to_string(),

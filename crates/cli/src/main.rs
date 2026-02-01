@@ -10,7 +10,6 @@ use clap::{Parser, Subcommand};
 use tracing_subscriber::EnvFilter;
 
 mod commands;
-mod confirm;
 
 /// Cherry2K - Zsh Terminal AI Assistant
 #[derive(Parser)]
