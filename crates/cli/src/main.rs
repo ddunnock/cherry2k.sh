@@ -9,6 +9,7 @@ use anyhow::{Context, Result};
 use cherry2k_storage::Database;
 use clap::{Parser, Subcommand};
 use tracing_subscriber::EnvFilter;
+use tracing_subscriber::prelude::*;
 
 mod commands;
 
@@ -73,6 +74,11 @@ enum Commands {
 /// Returns a guard that must be kept alive for the duration of the program.
 /// Sentry is only active if SENTRY_DSN environment variable is set.
 fn init_sentry() -> sentry::ClientInitGuard {
+    // Use lower sample rate in production to control costs
+    let sample_rate = std::env::var("SENTRY_ENVIRONMENT")
+        .map(|env| if env == "production" { 0.1 } else { 1.0 })
+        .unwrap_or(1.0);
+
     sentry::init((
         std::env::var("SENTRY_DSN").ok(),
         sentry::ClientOptions {
@@ -80,8 +86,9 @@ fn init_sentry() -> sentry::ClientInitGuard {
             environment: std::env::var("SENTRY_ENVIRONMENT")
                 .ok()
                 .map(std::borrow::Cow::Owned),
-            // Capture 100% of transactions for tracing (adjust in production)
-            traces_sample_rate: 1.0,
+            traces_sample_rate: sample_rate,
+            // Attach stacktraces to all messages for better debugging
+            attach_stacktrace: true,
             ..Default::default()
         },
     ))
@@ -92,6 +99,8 @@ async fn main() -> ExitCode {
     match run().await {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
+            // Capture error to Sentry before reporting to user
+            sentry::capture_error(&*e);
             eprintln!("Error: {e:?}");
             ExitCode::FAILURE
         }
@@ -112,9 +121,14 @@ async fn run() -> Result<()> {
     let cli = Cli::parse();
 
     // Initialize logging with Sentry integration
+    // Sentry layer captures warn/error logs as breadcrumbs
     let filter =
         EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(&cli.log_level));
-    tracing_subscriber::fmt().with_env_filter(filter).init();
+    tracing_subscriber::registry()
+        .with(filter)
+        .with(tracing_subscriber::fmt::layer())
+        .with(sentry::integrations::tracing::layer())
+        .init();
 
     // Load configuration
     let config = cherry2k_core::config::load_config()?;
@@ -176,8 +190,10 @@ async fn run() -> Result<()> {
                 panic!("Cherry2K test panic - this is intentional!");
             }
 
-            // Give Sentry time to send the event
-            std::thread::sleep(std::time::Duration::from_secs(2));
+            // Flush Sentry client to ensure events are sent
+            sentry::Hub::current()
+                .client()
+                .map(|c| c.flush(Some(std::time::Duration::from_secs(5))));
             println!("Test event sent! Check your Sentry dashboard.");
         }
     }
