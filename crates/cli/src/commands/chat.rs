@@ -29,7 +29,7 @@ use cherry2k_storage::{Database, prepare_context};
 use serde::Deserialize;
 use tokio_stream::StreamExt;
 
-use cherry2k::confirm::{ConfirmResult, confirm_command, edit_command};
+use cherry2k::confirm::{ConfirmResult, check_blocked_patterns, confirm_command, edit_command};
 use cherry2k::execute::{display_exit_status, execute_command};
 use cherry2k::intent::{Intent, detect_intent};
 use cherry2k::output::{
@@ -261,36 +261,71 @@ pub async fn run(
     // Detect if response contains a command suggestion (skip if force_question_mode)
     // Intent::Question means response was just an explanation, already displayed
     if !force_question_mode && let Intent::Command(detected) = detect_intent(&collected_response) {
+        // Check for blocked dangerous patterns first
+        if let Some(pattern) = check_blocked_patterns(&detected.command, &config.safety.blocked_patterns) {
+            println!();
+            println!("\x1b[31mBLOCKED:\x1b[0m Command matches dangerous pattern: {}", pattern);
+            println!("This command has been blocked for safety reasons.");
+            return Ok(());
+        }
+
         // Display the command with syntax highlighting
         display_suggested_command(&detected.command, detected.context.as_deref());
 
-        // Ask for confirmation
+        // Check if confirmation is required (respect config)
         let mut command_to_run = detected.command.clone();
-        loop {
-            match confirm_command(&command_to_run)? {
-                ConfirmResult::Yes => {
-                    println!(); // Blank line before execution
 
-                    // Execute with signal handling
-                    let result =
-                        execute_command(&command_to_run, Some(cancel_token.clone())).await?;
+        if config.safety.confirm_commands {
+            // Ask for confirmation
+            loop {
+                match confirm_command(&command_to_run)? {
+                    ConfirmResult::Yes => {
+                        // Re-check blocked patterns after edit
+                        if let Some(pattern) = check_blocked_patterns(&command_to_run, &config.safety.blocked_patterns) {
+                            println!();
+                            println!("\x1b[31mBLOCKED:\x1b[0m Command matches dangerous pattern: {}", pattern);
+                            println!("This command has been blocked for safety reasons.");
+                            return Ok(());
+                        }
 
-                    // Display exit status
-                    display_exit_status(result.status);
+                        println!(); // Blank line before execution
 
-                    if result.was_cancelled {
-                        println!("Command interrupted.");
+                        // Execute with signal handling
+                        let result =
+                            execute_command(&command_to_run, Some(cancel_token.clone())).await?;
+
+                        // Display exit status
+                        display_exit_status(result.status);
+
+                        if result.was_cancelled {
+                            println!("Command interrupted.");
+                        }
+                        break;
                     }
-                    break;
+                    ConfirmResult::No => {
+                        println!("Command cancelled.");
+                        break;
+                    }
+                    ConfirmResult::Edit => {
+                        command_to_run = edit_command(&command_to_run)?;
+                        // Re-display the edited command
+                        display_suggested_command(&command_to_run, None);
+                        // Loop continues to re-confirm
+                    }
                 }
-                ConfirmResult::No => {
-                    println!("Command cancelled.");
-                    break;
-                }
-                ConfirmResult::Edit => {
-                    command_to_run = edit_command(&command_to_run)?;
-                    // Loop continues to re-confirm
-                }
+            }
+        } else {
+            // Auto-execute without confirmation (confirm_commands = false)
+            println!(); // Blank line before execution
+
+            // Execute with signal handling
+            let result = execute_command(&command_to_run, Some(cancel_token.clone())).await?;
+
+            // Display exit status
+            display_exit_status(result.status);
+
+            if result.was_cancelled {
+                println!("Command interrupted.");
             }
         }
     }

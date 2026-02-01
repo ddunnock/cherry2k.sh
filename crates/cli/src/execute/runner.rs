@@ -8,11 +8,15 @@
 
 use std::io;
 use std::process::{ExitStatus, Stdio};
+use std::time::Duration;
 
 use colored::Colorize;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
 use tokio_util::sync::CancellationToken;
+
+/// Timeout for graceful shutdown after SIGINT before escalating to SIGKILL.
+const SIGKILL_TIMEOUT: Duration = Duration::from_secs(5);
 
 /// Result of command execution.
 #[derive(Debug)]
@@ -66,8 +70,14 @@ pub async fn execute_command(
         .spawn()?;
 
     let child_id = child.id();
-    let stdout = child.stdout.take().expect("stdout piped");
-    let stderr = child.stderr.take().expect("stderr piped");
+    let stdout = child
+        .stdout
+        .take()
+        .ok_or_else(|| io::Error::other("stdout not available"))?;
+    let stderr = child
+        .stderr
+        .take()
+        .ok_or_else(|| io::Error::other("stderr not available"))?;
 
     // Spawn task to read stderr (in red)
     let stderr_handle = tokio::spawn(async move {
@@ -101,8 +111,13 @@ pub async fn execute_command(
                         use nix::unistd::Pid;
                         // Send SIGINT to child process (positive pid)
                         // This is more reliable than process group signaling
-                        let pid = Pid::from_raw(id as i32);
-                        let _ = kill(pid, Signal::SIGINT);
+                        // Use try_from to avoid overflow on systems with large PIDs
+                        if let Ok(pid_i32) = i32::try_from(id) {
+                            let pid = Pid::from_raw(pid_i32);
+                            let _ = kill(pid, Signal::SIGINT);
+                        } else {
+                            tracing::warn!("Child PID {} exceeds i32::MAX, cannot send SIGINT", id);
+                        }
                     }
                 }
                 was_cancelled = true;
@@ -122,11 +137,33 @@ pub async fn execute_command(
         }
     }
 
-    // Wait for stderr task
-    let _ = stderr_handle.await;
+    // Wait for stderr task (log if it panicked)
+    if let Err(e) = stderr_handle.await {
+        tracing::warn!("Stderr reader task failed: {:?}", e);
+    }
 
-    // Wait for child to exit
-    let status = child.wait().await?;
+    // Wait for child to exit with timeout for cancelled commands
+    let status = if was_cancelled {
+        // Give process time to exit gracefully after SIGINT
+        match tokio::time::timeout(SIGKILL_TIMEOUT, child.wait()).await {
+            Ok(result) => result?,
+            Err(_) => {
+                // Timeout - escalate to SIGKILL
+                tracing::warn!("Process did not exit after SIGINT, sending SIGKILL");
+                #[cfg(unix)]
+                if let Some(id) = child_id {
+                    use nix::sys::signal::{kill, Signal};
+                    use nix::unistd::Pid;
+                    if let Ok(pid_i32) = i32::try_from(id) {
+                        let _ = kill(Pid::from_raw(pid_i32), Signal::SIGKILL);
+                    }
+                }
+                child.wait().await?
+            }
+        }
+    } else {
+        child.wait().await?
+    };
 
     Ok(CommandResult {
         status,

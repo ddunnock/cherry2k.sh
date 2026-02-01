@@ -10,8 +10,10 @@ use super::types::{DetectedCommand, Intent};
 
 /// Regex pattern for bash/sh/shell code blocks.
 /// Captures the content between ```bash/sh/shell and ```.
-static CODE_BLOCK_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"```(?:bash|sh|shell)\n([\s\S]*?)\n```").expect("valid regex"));
+/// Handles both Unix (\n) and Windows (\r\n) line endings.
+static CODE_BLOCK_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"```(?:bash|sh|shell)\r?\n([\s\S]*?)\r?\n```").expect("valid regex")
+});
 
 /// Detect intent from an AI response.
 ///
@@ -175,6 +177,31 @@ mod tests {
             Intent::Command(cmd) => {
                 assert_eq!(cmd.command, "ls");
                 assert!(cmd.context.is_none());
+            }
+            Intent::Question => panic!("Expected Command intent"),
+        }
+    }
+
+    #[test]
+    fn handles_crlf_line_endings() {
+        let response = "```bash\r\nls -la\r\n```";
+        let intent = detect_intent(response);
+        match intent {
+            Intent::Command(cmd) => {
+                assert_eq!(cmd.command, "ls -la");
+            }
+            Intent::Question => panic!("Expected Command intent"),
+        }
+    }
+
+    #[test]
+    fn handles_mixed_line_endings() {
+        let response = "Here's the command:\r\n```bash\necho hello\n```";
+        let intent = detect_intent(response);
+        match intent {
+            Intent::Command(cmd) => {
+                assert_eq!(cmd.command, "echo hello");
+                assert!(cmd.context.is_some());
             }
             Intent::Question => panic!("Expected Command intent"),
         }
