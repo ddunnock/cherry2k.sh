@@ -31,6 +31,7 @@ use tokio_stream::StreamExt;
 
 use cherry2k::confirm::{ConfirmResult, check_blocked_patterns, confirm_command, edit_command};
 use cherry2k::execute::{display_exit_status, execute_command};
+use cherry2k::files;
 use cherry2k::intent::{Intent, detect_intent};
 use cherry2k::output::{
     ResponseSpinner, StreamWriter, display_provider_error, display_suggested_command,
@@ -176,17 +177,57 @@ pub async fn run(
     // Check for question mode marker (? suffix)
     let force_question_mode = actual_message.ends_with('?') && !force_command_mode;
 
+    // Detect and inject file references before sending to AI
+    let cwd = std::env::current_dir().context("Failed to get current directory")?;
+    let file_refs = files::detect_file_references(actual_message, &cwd);
+
+    let mut file_context = String::new();
+    for path in &file_refs {
+        match files::FileReader::read_file(path) {
+            Ok(files::ReadResult::Content(content)) => {
+                file_context.push_str(&format!(
+                    "\n--- File: {} ---\n{}\n",
+                    path.display(),
+                    content
+                ));
+            }
+            Ok(files::ReadResult::TooLarge { size, .. }) => {
+                eprintln!("Skipping {} (too large: {} bytes)", path.display(), size);
+            }
+            Ok(files::ReadResult::Binary { .. }) => {
+                eprintln!("Skipping {} (binary file)", path.display());
+            }
+            Ok(files::ReadResult::Error { error, .. }) => {
+                eprintln!("Warning: Could not read {}: {}", path.display(), error);
+            }
+            Err(e) => {
+                eprintln!("Warning: Could not read {}: {}", path.display(), e);
+            }
+        }
+    }
+
+    // Build augmented message with file context if any
+    let augmented_message = if file_context.is_empty() {
+        actual_message.to_string()
+    } else {
+        tracing::debug!("Injected {} file(s) into context", file_refs.len());
+        format!(
+            "The user referenced these files:\n{}\n\nUser message: {}",
+            file_context, actual_message
+        )
+    };
+
     // Save user message before sending request (use actual_message for cleaner history)
     save_message(&db, &session_id, Role::User, actual_message, None)
         .await
         .context("Failed to save message")?;
 
-    // Build request with history + new message
+    // Build request with history + new message (using augmented version)
     // Always include command mode system prompt - AI decides based on context
     let request = CompletionRequest::new()
         .with_message(Message::system(command_mode_system_prompt()))
         .with_messages(context.messages)
-        .with_message(Message::user(actual_message));
+        .with_message(Message::user(&augmented_message));
 
     tracing::debug!(
         "Request mode: force_command={}, force_question={}",
