@@ -14,14 +14,14 @@ tokio = { version = "1.49.0", features = ["full"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 thiserror = "2.0.18"
-anyhow = "1.0.100"
+anyhow = "1.0.101"
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
 toml = "0.9.11+spec-1.1.0"
 directories = "6.0.0"
 tempfile = "3.24.0"
-clap = { version = "4.5.56", features = ["derive"] }
-sentry = { version = "0.46.1", default-features = false, features = ["backtrace", "contexts", "panic", "tracing", "reqwest", "rustls"] }
+clap = { version = "4.5.57", features = ["derive"] }
+sentry = { version = "0.46.2", default-features = false, features = ["backtrace", "contexts", "panic", "tracing", "reqwest", "rustls"] }
 dotenvy = "0.15.7"
 reqwest = { version = "0.12", features = ["json", "stream"] }
 futures = "0.3"
