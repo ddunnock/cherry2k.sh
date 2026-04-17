@@ -23,7 +23,7 @@ tempfile = "3.24.0"
 clap = { version = "4.5.56", features = ["derive"] }
 sentry = { version = "0.46.1", default-features = false, features = ["backtrace", "contexts", "panic", "tracing", "reqwest", "rustls"] }
 dotenvy = "0.15.7"
-reqwest = { version = "0.12", features = ["json", "stream"] }
+reqwest = { version = "0.13", features = ["json", "stream"] }
 futures = "0.3"
 tokio-stream = "0.1"
 async-stream = "0.3"
