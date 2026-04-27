@@ -41,7 +41,7 @@ regex = "1"
 walkdir = "2.5"
 ignore = "0.4"
 edit = "0.1"
-similar = "2.7"
+similar = "3.1"
 git2 = { version = "0.19", default-features = false }
 
 [workspace.lints.rust]
